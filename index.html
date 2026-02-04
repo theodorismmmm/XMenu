@@ -3,169 +3,214 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>IP Status</title>
+    <title>XMenu</title>
     <style>
       :root {
         color-scheme: light;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f7f7f8;
-        color: #1a1a1a;
+        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
+        padding: 48px 20px;
       }
-      .card {
-        text-align: center;
-        padding: 2.5rem 2rem;
-        border-radius: 20px;
-        background: #fff;
-        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
-        width: min(420px, 90vw);
+
+      main {
+        width: min(960px, 100%);
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 28px;
+        padding: 56px clamp(24px, 5vw, 64px);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.45);
+        display: grid;
+        gap: 40px;
       }
-      .status-icon {
-        width: 96px;
-        height: 96px;
-        margin: 0 auto 1rem;
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
       }
+
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.32em;
+        font-size: 0.75rem;
+        color: #94a3b8;
+      }
+
       h1 {
-        font-size: 1.6rem;
-        margin: 0 0 0.4rem;
+        margin: 0;
+        font-size: clamp(2.4rem, 4vw, 3.6rem);
+        color: #f8fafc;
       }
+
       p {
         margin: 0;
-        color: #5a5a5a;
+        font-size: 1.05rem;
+        color: #cbd5f5;
+        line-height: 1.6;
       }
-      .loading {
-        font-size: 1.1rem;
-        letter-spacing: 0.02em;
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
       }
-      .error {
-        color: #b91c1c;
+
+      .button {
+        text-decoration: none;
         font-weight: 600;
+        padding: 14px 26px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid transparent;
       }
-      .blocked {
-        background: #111827;
-        color: #f9fafb;
-        box-shadow: none;
+
+      .button.primary {
+        background: #38bdf8;
+        color: #0f172a;
+        box-shadow: 0 14px 32px rgba(56, 189, 248, 0.35);
       }
-      .blocked p {
-        color: #d1d5db;
+
+      .button.secondary {
+        background: transparent;
+        color: #e2e8f0;
+        border-color: rgba(148, 163, 184, 0.4);
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.4);
+      }
+
+      .details {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+
+      .detail-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 18px 20px;
+      }
+
+      .detail-card h2 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+        color: #f1f5f9;
+      }
+
+      .detail-card p {
+        font-size: 0.95rem;
+        color: #cbd5f5;
+      }
+
+      footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+
+      .footer-note {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .pill {
+        background: rgba(56, 189, 248, 0.15);
+        color: #7dd3fc;
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-weight: 600;
+        font-size: 0.75rem;
       }
     </style>
   </head>
   <body>
-    <main class="card" id="status-card" aria-live="polite">
-      <div class="loading" id="status-message">Checking your IP...</div>
+    <main>
+      <header>
+        <span class="eyebrow">XMenu main site</span>
+        <h1>Serve up your next experience with XMenu.</h1>
+        <p>
+          XMenu is the all-in-one hub for menus, ordering, and guest engagement.
+          We are getting the next release ready—grab the placeholder download or
+          reach out to learn more.
+        </p>
+        <div class="actions">
+          <a
+            class="button primary"
+            href="https://example.com/download"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Download (Placeholder)
+          </a>
+          <a
+            class="button secondary"
+            href="mailto:cool73800@gmail.com"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Contact us
+          </a>
+        </div>
+      </header>
+
+      <section class="details">
+        <div class="detail-card">
+          <h2>Launch-ready design</h2>
+          <p>
+            Polished layouts and visuals built to highlight your brand from the
+            first click.
+          </p>
+        </div>
+        <div class="detail-card">
+          <h2>Fast onboarding</h2>
+          <p>
+            Simple setup flows so you can go live quickly and stay focused on
+            your customers.
+          </p>
+        </div>
+        <div class="detail-card">
+          <h2>Always evolving</h2>
+          <p>
+            New releases and enhancements are on the way—stay connected to stay
+            ahead.
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="footer-note">
+          <span class="pill">Coming soon</span>
+          <span>Placeholder download link will be updated.</span>
+        </div>
+        <span>Contact: cool73800@gmail.com</span>
+      </footer>
     </main>
-
-    <script>
-      const card = document.getElementById("status-card");
-
-      const createCheck = () => {
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("viewBox", "0 0 120 120");
-        svg.setAttribute("class", "status-icon");
-        svg.innerHTML = `
-          <circle cx="60" cy="60" r="54" fill="#dcfce7" />
-          <path d="M38 62.5l13 13 30-30" fill="none" stroke="#16a34a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
-        `;
-        return svg;
-      };
-
-      const createBlocked = () => {
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("viewBox", "0 0 120 120");
-        svg.setAttribute("class", "status-icon");
-        svg.innerHTML = `
-          <circle cx="60" cy="60" r="54" fill="#111827" stroke="#ef4444" stroke-width="6" />
-          <path d="M38 38l44 44M82 38L38 82" fill="none" stroke="#ef4444" stroke-width="10" stroke-linecap="round" />
-        `;
-        return svg;
-      };
-
-      const normalizeIp = (value) => value.trim().toLowerCase();
-
-      const loadBlacklist = async () => {
-        const response = await fetch("blacklist.txt", { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error("Could not load blacklist file.");
-        }
-        const text = await response.text();
-        const cleaned = text.replace(/#.*/g, "");
-        return cleaned
-          .split(/,|\n/)
-          .map(normalizeIp)
-          .filter(Boolean);
-      };
-
-      const loadClientIp = async () => {
-        const response = await fetch("https://api.ipify.org?format=json", {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          throw new Error("Could not detect IP.");
-        }
-        const data = await response.json();
-        return normalizeIp(data.ip || "");
-      };
-
-      const showBlocked = () => {
-        card.classList.add("blocked");
-        card.innerHTML = "";
-        card.appendChild(createBlocked());
-        const title = document.createElement("h1");
-        title.textContent = "Your IP has been blacklisted";
-        const detail = document.createElement("p");
-        detail.textContent = "Access to this site is restricted.";
-        card.append(title, detail);
-      };
-
-      const showAllowed = () => {
-        card.classList.remove("blocked");
-        card.innerHTML = "";
-        card.appendChild(createCheck());
-        const title = document.createElement("h1");
-        title.textContent = "Access granted";
-        const detail = document.createElement("p");
-        detail.textContent = "Your IP is not on the blacklist.";
-        card.append(title, detail);
-      };
-
-      const showError = (error) => {
-        card.innerHTML = "";
-        const title = document.createElement("h1");
-        title.textContent = "Unable to verify";
-        const detail = document.createElement("p");
-        detail.className = "error";
-        detail.textContent = error.message || "Something went wrong.";
-        card.append(title, detail);
-      };
-
-      const run = async () => {
-        try {
-          const [blacklist, ip] = await Promise.all([
-            loadBlacklist(),
-            loadClientIp(),
-          ]);
-          if (!ip) {
-            throw new Error("IP address was empty.");
-          }
-          if (blacklist.includes(ip)) {
-            showBlocked();
-          } else {
-            showAllowed();
-          }
-        } catch (error) {
-          showError(error);
-        }
-      };
-
-      run();
-    </script>
   </body>
 </html>
