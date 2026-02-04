@@ -365,57 +365,6 @@
         font-weight: 600;
         text-decoration: none;
       }
-
-      .pinned-panel {
-        background: rgba(30, 41, 59, 0.75);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 20px;
-        padding: 24px clamp(18px, 4vw, 32px);
-        display: grid;
-        gap: 16px;
-      }
-
-      .pinned-panel h2 {
-        margin: 0;
-        color: #f8fafc;
-        font-size: 1.3rem;
-      }
-
-      .pinned-form {
-        display: grid;
-        gap: 12px;
-      }
-
-      .pinned-form label {
-        font-size: 0.9rem;
-        color: #cbd5f5;
-        display: grid;
-        gap: 8px;
-      }
-
-      .pinned-form textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 12px 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        background: rgba(15, 23, 42, 0.8);
-        color: #e2e8f0;
-        font-size: 0.95rem;
-        resize: vertical;
-      }
-
-      .pinned-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        align-items: center;
-      }
-
-      .pinned-helper {
-        font-size: 0.85rem;
-        color: #94a3b8;
-      }
     </style>
   </head>
   <body>
@@ -443,22 +392,17 @@
     </div>
 
     <main>
-      <section class="pinned-banner" id="pinnedBanner" hidden>
+      <!-- PINNED MESSAGE: nur im HTML bearbeiten -->
+      <section class="pinned-banner" id="pinnedBanner">
         <h2>Angeheftete Nachricht</h2>
-        <p id="pinnedMessage">
-          XMENUUUUUU
-        </p>
-        <a id="pinnedDownload" href="#" download="pinned-message.txt">
-          .txt
-        </a>
+        <p id="pinnedMessage">XMENUUUUUU</p>
+        <a id="pinnedDownload" href="#" download="pinned-message.txt">.txt</a>
       </section>
 
       <header>
         <span class="eyebrow">XMenu Hauptseite</span>
         <h1>Dein nächstes Ipad erlebnis beginnt mit XMenu.</h1>
-        <p>
-    
-        </p>
+        <p></p>
         <div class="actions">
           <a class="button primary" href="#">Download</a>
           <a class="button secondary" href="mailto:cool73800@gmail.com">Kontakt</a>
@@ -481,30 +425,6 @@
           <h2>Ständige Weiterentwicklung</h2>
           <p>Regelmäßige Updates und neue Funktionen.</p>
         </div>
-      </section>
-
-      <section class="pinned-panel">
-        <div>
-          <h2>Pinned Message erstellen</h2>
-          <p>
-            Erstelle eine angeheftete Nachricht. Die Nachricht wird oben angezeigt und als
-            TXT-Datei gespeichert.
-          </p>
-        </div>
-        <form class="pinned-form" id="pinnedForm">
-          <label>
-            Nachricht
-            <textarea
-              name="pinnedMessage"
-              placeholder="Schreibe deine angeheftete Nachricht…"
-              required
-            ></textarea>
-          </label>
-          <div class="pinned-actions">
-            <button class="button primary" type="submit">Pinned Message speichern</button>
-            <span class="pinned-helper">Die Datei wird als pinned-message.txt erstellt.</span>
-          </div>
-        </form>
       </section>
 
       <section class="support-panel" id="supportPanel" hidden>
@@ -580,12 +500,12 @@
       const count = document.getElementById("assetCount");
       const badge = document.getElementById("assetBadge");
       const skipBtn = document.getElementById("skipBtn");
+
       const supportToggle = document.getElementById("supportToggle");
       const supportPanel = document.getElementById("supportPanel");
       const supportForm = document.getElementById("supportForm");
-      const pinnedForm = document.getElementById("pinnedForm");
-      const pinnedBanner = document.getElementById("pinnedBanner");
-      const pinnedMessage = document.getElementById("pinnedMessage");
+
+      const pinnedMessageEl = document.getElementById("pinnedMessage");
       const pinnedDownload = document.getElementById("pinnedDownload");
 
       let index = 0;
@@ -628,7 +548,7 @@
             clearInterval(timerId);
             finish();
           }
-        }, 500); // 0,5 Sekunden pro Element
+        }, 500);
       };
 
       skipBtn.addEventListener("click", () => {
@@ -664,25 +584,18 @@
         window.location.href = `mailto:cool73800@gmail.com?subject=${subject}&body=${body}`;
       });
 
-      pinnedForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const formData = new FormData(pinnedForm);
-        const message = formData.get("pinnedMessage").trim();
-
-        if (!message) return;
-
-        pinnedMessage.textContent = message;
-        pinnedBanner.removeAttribute("hidden");
-
-        const fileContent = `Pinned Message\n\n${message}\n`;
+      // .txt-Download für die angeheftete Nachricht (Text kommt aus dem HTML)
+      const buildPinnedDownload = () => {
+        const message = (pinnedMessageEl.textContent || "").trim();
+        const fileContent = `Angeheftete Nachricht\n\n${message}\n`;
         const fileBlob = new Blob([fileContent], { type: "text/plain" });
-        if (pinnedFileUrl) {
-          URL.revokeObjectURL(pinnedFileUrl);
-        }
+
+        if (pinnedFileUrl) URL.revokeObjectURL(pinnedFileUrl);
         pinnedFileUrl = URL.createObjectURL(fileBlob);
         pinnedDownload.href = pinnedFileUrl;
-      });
+      };
 
+      buildPinnedDownload();
       start();
     </script>
   </body>
