@@ -1,2 +1,171 @@
-Nothing to see here yet!
-    
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IP Status</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f7f7f8;
+        color: #1a1a1a;
+      }
+      .card {
+        text-align: center;
+        padding: 2.5rem 2rem;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+        width: min(420px, 90vw);
+      }
+      .status-icon {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 1rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 0.4rem;
+      }
+      p {
+        margin: 0;
+        color: #5a5a5a;
+      }
+      .loading {
+        font-size: 1.1rem;
+        letter-spacing: 0.02em;
+      }
+      .error {
+        color: #b91c1c;
+        font-weight: 600;
+      }
+      .blocked {
+        background: #111827;
+        color: #f9fafb;
+        box-shadow: none;
+      }
+      .blocked p {
+        color: #d1d5db;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" id="status-card" aria-live="polite">
+      <div class="loading" id="status-message">Checking your IP...</div>
+    </main>
+
+    <script>
+      const card = document.getElementById("status-card");
+
+      const createCheck = () => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 120 120");
+        svg.setAttribute("class", "status-icon");
+        svg.innerHTML = `
+          <circle cx="60" cy="60" r="54" fill="#dcfce7" />
+          <path d="M38 62.5l13 13 30-30" fill="none" stroke="#16a34a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+        `;
+        return svg;
+      };
+
+      const createBlocked = () => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 120 120");
+        svg.setAttribute("class", "status-icon");
+        svg.innerHTML = `
+          <circle cx="60" cy="60" r="54" fill="#111827" stroke="#ef4444" stroke-width="6" />
+          <path d="M38 38l44 44M82 38L38 82" fill="none" stroke="#ef4444" stroke-width="10" stroke-linecap="round" />
+        `;
+        return svg;
+      };
+
+      const normalizeIp = (value) => value.trim().toLowerCase();
+
+      const loadBlacklist = async () => {
+        const response = await fetch("blacklist.txt", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("Could not load blacklist file.");
+        }
+        const text = await response.text();
+        const cleaned = text.replace(/#.*/g, "");
+        return cleaned
+          .split(/,|\n/)
+          .map(normalizeIp)
+          .filter(Boolean);
+      };
+
+      const loadClientIp = async () => {
+        const response = await fetch("https://api.ipify.org?format=json", {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error("Could not detect IP.");
+        }
+        const data = await response.json();
+        return normalizeIp(data.ip || "");
+      };
+
+      const showBlocked = () => {
+        card.classList.add("blocked");
+        card.innerHTML = "";
+        card.appendChild(createBlocked());
+        const title = document.createElement("h1");
+        title.textContent = "Your IP has been blacklisted";
+        const detail = document.createElement("p");
+        detail.textContent = "Access to this site is restricted.";
+        card.append(title, detail);
+      };
+
+      const showAllowed = () => {
+        card.classList.remove("blocked");
+        card.innerHTML = "";
+        card.appendChild(createCheck());
+        const title = document.createElement("h1");
+        title.textContent = "Access granted";
+        const detail = document.createElement("p");
+        detail.textContent = "Your IP is not on the blacklist.";
+        card.append(title, detail);
+      };
+
+      const showError = (error) => {
+        card.innerHTML = "";
+        const title = document.createElement("h1");
+        title.textContent = "Unable to verify";
+        const detail = document.createElement("p");
+        detail.className = "error";
+        detail.textContent = error.message || "Something went wrong.";
+        card.append(title, detail);
+      };
+
+      const run = async () => {
+        try {
+          const [blacklist, ip] = await Promise.all([
+            loadBlacklist(),
+            loadClientIp(),
+          ]);
+          if (!ip) {
+            throw new Error("IP address was empty.");
+          }
+          if (blacklist.includes(ip)) {
+            showBlocked();
+          } else {
+            showAllowed();
+          }
+        } catch (error) {
+          showError(error);
+        }
+      };
+
+      run();
+    </script>
+  </body>
+</html>
