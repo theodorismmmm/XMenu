@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,8 +7,8 @@
     <style>
       :root {
         color-scheme: light;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
         background-color: #0f172a;
         color: #e2e8f0;
       }
@@ -148,64 +148,203 @@
         font-weight: 600;
         font-size: 0.75rem;
       }
+
+      /* Ladebildschirm (nur visuell) */
+      .loading-overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 28px 18px;
+        background: radial-gradient(
+          circle at top,
+          rgba(30, 41, 59, 0.95),
+          rgba(15, 23, 42, 0.98) 70%
+        );
+        z-index: 9999;
+        transition: opacity 260ms ease, transform 260ms ease;
+      }
+
+      .loading-overlay.hidden {
+        opacity: 0;
+        transform: translateY(6px);
+        pointer-events: none;
+      }
+
+      .loader-card {
+        width: min(560px, 100%);
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 24px;
+        padding: 26px 24px;
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.55);
+        display: grid;
+        gap: 16px;
+      }
+
+      .loader-top {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .loader-title strong {
+        color: #f8fafc;
+        font-size: 1.05rem;
+      }
+
+      .loader-title span {
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+
+      .spinner {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 3px solid rgba(148, 163, 184, 0.25);
+        border-top-color: rgba(56, 189, 248, 0.95);
+        animation: spin 700ms linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .progress {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.18);
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+      }
+
+      .progress > div {
+        height: 100%;
+        width: 0%;
+        background: rgba(56, 189, 248, 0.95);
+        transition: width 200ms ease;
+      }
+
+      .checks {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .checks li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        color: #cbd5f5;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.35);
+      }
+
+      .checks li.done .dot {
+        background: rgba(56, 189, 248, 0.95);
+      }
     </style>
   </head>
   <body>
+    <!-- Visueller Ladebildschirm -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loader-card">
+        <div class="loader-top">
+          <div class="loader-title">
+            <strong>XMenu wird vorbereitet</strong>
+            <span>Schnelle Prüfungen laufen…</span>
+          </div>
+          <div class="spinner"></div>
+        </div>
+
+        <div class="progress">
+          <div id="progressBar"></div>
+        </div>
+
+        <ul class="checks">
+          <li class="done">
+            <span class="dot"></span>
+            <span>Website-Status wird geprüft</span>
+          </li>
+          <li class="done">
+            <span class="dot"></span>
+            <span>IP-Blacklist wird geprüft</span>
+          </li>
+          <li class="done">
+            <span class="dot"></span>
+            <span>Erlebnis wird geladen</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <main>
       <header>
-        <span class="eyebrow">XMenu's Website</span>
-        <h1>Verbessere deine Ipad erfahrung<h1></h1>
+        <span class="eyebrow">XMenu Hauptseite</span>
+        <h1>Dein nächstes Erlebnis beginnt mit XMenu.</h1>
         <p>
-          XMenu ist der beste shortcut für Produktivität während des Unterrichts oder zuhause
+          XMenu ist die zentrale Plattform für Menüs, Bestellungen und
+          Gästeinteraktion. Der nächste Release ist in Vorbereitung.
         </p>
         <div class="actions">
-          <a
-            class="button primary"
-            href="https://xmenu.neocities.com"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Herunterladen
+          <a class="button primary" href="#">
+            Download (Platzhalter)
           </a>
-          <a
-            class="button secondary"
-            href="mailto:cool73800@gmail.com"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Kontaktieren sie uns
+          <a class="button secondary" href="mailto:cool73800@gmail.com">
+            Kontakt
           </a>
         </div>
       </header>
 
       <section class="details">
         <div class="detail-card">
-          <h2>Viele features ein Tool</h2>
-          <p>
-            Poliertes design mit neuen features 
-          </p>
+          <h2>Startklar im Design</h2>
+          <p>Moderne Layouts für einen starken ersten Eindruck.</p>
         </div>
         <div class="detail-card">
-          <h2>Schnelles setup</h2>
-          <p>
-            Simples setup.Habe direkt zugriff zu xmenu
-          </p>
+          <h2>Schnelles Onboarding</h2>
+          <p>Einfache Einrichtung, sofort einsatzbereit.</p>
         </div>
         <div class="detail-card">
-          <h2>Immer besser</h2>
-          <p>
-            Wir bringen ständig neue features und versionen raus 
-          </p>
+          <h2>Ständige Weiterentwicklung</h2>
+          <p>Regelmäßige Updates und neue Funktionen.</p>
         </div>
       </section>
 
       <footer>
         <div class="footer-note">
-          <span class="pill">Coming soon</span>
-          <span>Patch 1.2.7</span></span>
+          <span class="pill">Demnächst verfügbar</span>
+          <span>Download-Link folgt in Kürze.</span>
         </div>
-        <span>Contact: cool73800@gmail.com</span>
+        <span>Kontakt: cool73800@gmail.com</span>
       </footer>
     </main>
+
+    <script>
+      const overlay = document.getElementById("loadingOverlay");
+      const bar = document.getElementById("progressBar");
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 20;
+        bar.style.width = progress + "%";
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => overlay.classList.add("hidden"), 300);
+        }
+      }, 180);
+    </script>
   </body>
 </html>
