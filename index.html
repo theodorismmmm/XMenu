@@ -149,61 +149,83 @@
         font-size: 0.75rem;
       }
 
-      /* Ladebildschirm (nur visuell) */
-      .loading-overlay {
+      /* Asset-Ladeanzeige (unten rechts, nur visuell) */
+      .asset-loader {
         position: fixed;
-        inset: 0;
+        right: 18px;
+        bottom: 18px;
+        width: min(340px, calc(100vw - 36px));
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 18px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.55);
+        padding: 14px 14px 12px;
         display: grid;
-        place-items: center;
-        padding: 28px 18px;
-        background: radial-gradient(
-          circle at top,
-          rgba(30, 41, 59, 0.95),
-          rgba(15, 23, 42, 0.98) 70%
-        );
+        gap: 10px;
         z-index: 9999;
-        transition: opacity 260ms ease, transform 260ms ease;
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 220ms ease, transform 220ms ease;
       }
 
-      .loading-overlay.hidden {
+      .asset-loader.hidden {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translateY(8px);
         pointer-events: none;
       }
 
-      .loader-card {
-        width: min(560px, 100%);
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.22);
-        border-radius: 24px;
-        padding: 26px 24px;
-        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.55);
-        display: grid;
-        gap: 16px;
-      }
-
-      .loader-top {
+      .asset-top {
         display: flex;
-        gap: 12px;
         align-items: center;
         justify-content: space-between;
+        gap: 10px;
       }
 
-      .loader-title strong {
+      .asset-title {
+        display: grid;
+        gap: 2px;
+      }
+
+      .asset-title strong {
         color: #f8fafc;
-        font-size: 1.05rem;
+        font-size: 0.95rem;
+        line-height: 1.2;
       }
 
-      .loader-title span {
+      .asset-title span {
         color: #94a3b8;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
       }
 
-      .spinner {
-        width: 36px;
-        height: 36px;
+      .asset-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .skip-btn {
+        appearance: none;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: transparent;
+        color: #e2e8f0;
         border-radius: 999px;
-        border: 3px solid rgba(148, 163, 184, 0.25);
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .skip-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.4);
+      }
+
+      .mini-spinner {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 2px solid rgba(148, 163, 184, 0.25);
         border-top-color: rgba(56, 189, 248, 0.95);
         animation: spin 700ms linear infinite;
       }
@@ -214,7 +236,7 @@
         }
       }
 
-      .progress {
+      .asset-progress {
         height: 10px;
         border-radius: 999px;
         background: rgba(148, 163, 184, 0.18);
@@ -222,71 +244,53 @@
         border: 1px solid rgba(148, 163, 184, 0.15);
       }
 
-      .progress > div {
+      .asset-progress > div {
         height: 100%;
         width: 0%;
         background: rgba(56, 189, 248, 0.95);
-        transition: width 200ms ease;
+        transition: width 180ms ease;
       }
 
-      .checks {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        gap: 10px;
-      }
-
-      .checks li {
+      .asset-detail {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 10px;
-        font-size: 0.95rem;
-        color: #cbd5f5;
+        color: #94a3b8;
+        font-size: 0.85rem;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
+      .asset-badge {
+        background: rgba(56, 189, 248, 0.15);
+        color: #7dd3fc;
         border-radius: 999px;
-        background: rgba(148, 163, 184, 0.35);
-      }
-
-      .checks li.done .dot {
-        background: rgba(56, 189, 248, 0.95);
+        padding: 4px 10px;
+        font-weight: 700;
+        font-size: 0.75rem;
       }
     </style>
   </head>
   <body>
-    <!-- Visueller Ladebildschirm -->
-    <div class="loading-overlay" id="loadingOverlay">
-      <div class="loader-card">
-        <div class="loader-top">
-          <div class="loader-title">
-            <strong>XMenu wird vorbereitet</strong>
-            <span>Schnelle Prüfungen laufen…</span>
-          </div>
-          <div class="spinner"></div>
+    <!-- Asset-Ladeanzeige -->
+    <div class="asset-loader" id="assetLoader" aria-live="polite">
+      <div class="asset-top">
+        <div class="asset-title">
+          <strong>Assets werden geladen</strong>
+          <span id="assetSub">Initialisierung…</span>
         </div>
-
-        <div class="progress">
-          <div id="progressBar"></div>
+        <div class="asset-actions">
+          <button class="skip-btn" id="skipBtn" type="button">Überspringen</button>
+          <div class="mini-spinner" aria-hidden="true"></div>
         </div>
+      </div>
 
-        <ul class="checks">
-          <li class="done">
-            <span class="dot"></span>
-            <span>Website-Status wird geprüft</span>
-          </li>
-          <li class="done">
-            <span class="dot"></span>
-            <span>IP-Blacklist wird geprüft</span>
-          </li>
-          <li class="done">
-            <span class="dot"></span>
-            <span>Erlebnis wird geladen</span>
-          </li>
-        </ul>
+      <div class="asset-progress" aria-hidden="true">
+        <div id="assetBar"></div>
+      </div>
+
+      <div class="asset-detail">
+        <span id="assetCount">0 / 0</span>
+        <span class="asset-badge" id="assetBadge">0%</span>
       </div>
     </div>
 
@@ -295,22 +299,19 @@
         <span class="eyebrow">XMenu Hauptseite</span>
         <h1>Dein nächstes Erlebnis beginnt mit XMenu.</h1>
         <p>
-         Xmenu ist die beste Plattform für die Bedienung des Ipads
+          XMenu ist die zentrale Plattform für Menüs, Bestellungen und Gästeinteraktion.
+          Der nächste Release ist in Vorbereitung.
         </p>
         <div class="actions">
-          <a class="button primary" href="#">
-            Download 
-          </a>
-          <a class="button secondary" href="mailto:cool73800@gmail.com">
-            Kontakt
-          </a>
+          <a class="button primary" href="#">Download (Platzhalter)</a>
+          <a class="button secondary" href="mailto:cool73800@gmail.com">Kontakt</a>
         </div>
       </header>
 
       <section class="details">
         <div class="detail-card">
           <h2>Startklar im Design</h2>
-          <p>Modernes Interface im XMenu</p>
+          <p>Moderne Layouts für einen starken ersten Eindruck.</p>
         </div>
         <div class="detail-card">
           <h2>Schnelles Onboarding</h2>
@@ -325,25 +326,80 @@
       <footer>
         <div class="footer-note">
           <span class="pill">Demnächst verfügbar</span>
-          <span>Patch 1.2.7</span>
+          <span>Download-Link folgt in Kürze.</span>
         </div>
         <span>Kontakt: cool73800@gmail.com</span>
       </footer>
     </main>
 
     <script>
-      const overlay = document.getElementById("loadingOverlay");
-      const bar = document.getElementById("progressBar");
+      // NUR VISUELL: simuliertes Laden (jedes Element braucht 0,5s)
+      const assets = [
+        "Styles",
+        "Schriften",
+        "Layout",
+        "Icons",
+        "Bilder",
+        "Konfiguration",
+        "Komponenten",
+        "Footer",
+      ];
 
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 20;
-        bar.style.width = progress + "%";
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => overlay.classList.add("hidden"), 300);
+      const loader = document.getElementById("assetLoader");
+      const sub = document.getElementById("assetSub");
+      const bar = document.getElementById("assetBar");
+      const count = document.getElementById("assetCount");
+      const badge = document.getElementById("assetBadge");
+      const skipBtn = document.getElementById("skipBtn");
+
+      let index = 0;
+      let done = false;
+      let timerId = null;
+
+      const total = assets.length;
+
+      const render = () => {
+        const loaded = Math.min(index, total);
+        const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
+        count.textContent = `${loaded} / ${total}`;
+        badge.textContent = `${pct}%`;
+        bar.style.width = `${pct}%`;
+
+        if (!done && loaded < total) {
+          sub.textContent = `Lade: ${assets[loaded]}…`;
+        } else {
+          sub.textContent = "Fertig.";
         }
-      }, 180);
+      };
+
+      const finish = () => {
+        if (done) return;
+        done = true;
+        index = total;
+        render();
+        setTimeout(() => loader.classList.add("hidden"), 350);
+      };
+
+      const start = () => {
+        render();
+        if (total === 0) return finish();
+
+        timerId = setInterval(() => {
+          index += 1;
+          render();
+          if (index >= total) {
+            clearInterval(timerId);
+            finish();
+          }
+        }, 500); // 0,5 Sekunden pro Element
+      };
+
+      skipBtn.addEventListener("click", () => {
+        if (timerId) clearInterval(timerId);
+        finish();
+      });
+
+      start();
     </script>
   </body>
 </html>
