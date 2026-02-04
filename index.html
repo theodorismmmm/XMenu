@@ -268,6 +268,77 @@
         font-weight: 700;
         font-size: 0.75rem;
       }
+
+      .support-panel {
+        background: rgba(30, 41, 59, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 28px clamp(18px, 4vw, 32px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .support-panel h2 {
+        margin: 0;
+        color: #f8fafc;
+        font-size: 1.4rem;
+      }
+
+      .support-panel p {
+        color: #cbd5f5;
+        font-size: 0.98rem;
+      }
+
+      .support-form {
+        display: grid;
+        gap: 16px;
+      }
+
+      .support-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .support-form label {
+        font-size: 0.9rem;
+        color: #cbd5f5;
+        display: grid;
+        gap: 6px;
+      }
+
+      .support-form select,
+      .support-form input,
+      .support-form textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-size: 0.95rem;
+      }
+
+      .support-form textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .support-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .support-helper {
+        font-size: 0.85rem;
+        color: #94a3b8;
+      }
+
+      .support-panel[hidden] {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -304,6 +375,9 @@
         <div class="actions">
           <a class="button primary" href="#">Download</a>
           <a class="button secondary" href="mailto:cool73800@gmail.com">Kontakt</a>
+          <button class="button secondary" id="supportToggle" type="button">
+            Tech Support
+          </button>
         </div>
       </header>
 
@@ -320,6 +394,51 @@
           <h2>Ständige Weiterentwicklung</h2>
           <p>Regelmäßige Updates und neue Funktionen.</p>
         </div>
+      </section>
+
+      <section class="support-panel" id="supportPanel" hidden>
+        <div>
+          <h2>Tech Support Anfrage</h2>
+          <p>
+            Wähle Gerätetyp, Marke und Modell aus und beschreibe dein Problem. Die Anfrage
+            wird per E-Mail an unser Support-Team gesendet.
+          </p>
+        </div>
+        <form class="support-form" id="supportForm">
+          <div class="support-grid">
+            <label>
+              Gerätetyp
+              <select name="deviceType" required>
+                <option value="" disabled selected>Bitte wählen</option>
+                <option value="Phone">Phone</option>
+                <option value="Laptop">Laptop</option>
+                <option value="iPad">iPad</option>
+              </select>
+            </label>
+            <label>
+              Marke
+              <input name="brand" placeholder="z. B. Apple, Samsung, Dell" required />
+            </label>
+            <label>
+              Modell
+              <input name="model" placeholder="z. B. iPhone 14, XPS 13" required />
+            </label>
+          </div>
+          <label>
+            Beschreibe dein Problem
+            <textarea
+              name="issue"
+              placeholder="Kurze Beschreibung des Problems…"
+              required
+            ></textarea>
+          </label>
+          <div class="support-actions">
+            <button class="button primary" type="submit">Support anfragen</button>
+            <span class="support-helper">
+              Es öffnet sich dein E-Mail-Programm mit der fertigen Nachricht.
+            </span>
+          </div>
+        </form>
       </section>
 
       <footer>
@@ -350,6 +469,9 @@
       const count = document.getElementById("assetCount");
       const badge = document.getElementById("assetBadge");
       const skipBtn = document.getElementById("skipBtn");
+      const supportToggle = document.getElementById("supportToggle");
+      const supportPanel = document.getElementById("supportPanel");
+      const supportForm = document.getElementById("supportForm");
 
       let index = 0;
       let done = false;
@@ -396,6 +518,34 @@
       skipBtn.addEventListener("click", () => {
         if (timerId) clearInterval(timerId);
         finish();
+      });
+
+      supportToggle.addEventListener("click", () => {
+        const isHidden = supportPanel.hasAttribute("hidden");
+        if (isHidden) {
+          supportPanel.removeAttribute("hidden");
+          supportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          supportPanel.setAttribute("hidden", "");
+        }
+      });
+
+      supportForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = new FormData(supportForm);
+        const deviceType = formData.get("deviceType");
+        const brand = formData.get("brand");
+        const model = formData.get("model");
+        const issue = formData.get("issue");
+
+        const subject = encodeURIComponent(
+          `Tech Support: ${deviceType} - ${brand} ${model}`
+        );
+        const body = encodeURIComponent(
+          `Gerätetyp: ${deviceType}\nMarke: ${brand}\nModell: ${model}\n\nProblem:\n${issue}`
+        );
+
+        window.location.href = `mailto:cool73800@gmail.com?subject=${subject}&body=${body}`;
       });
 
       start();
