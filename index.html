@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>XMenu</title>
+    <title>XMenu - Your iPad Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        color-scheme: light;
+        color-scheme: dark;
         font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
         background-color: #0f172a;
@@ -15,6 +18,8 @@
 
       * {
         box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
 
       body {
@@ -36,6 +41,7 @@
         box-shadow: 0 30px 80px rgba(15, 23, 42, 0.45);
         display: grid;
         gap: 40px;
+        backdrop-filter: blur(10px);
       }
 
       header {
@@ -49,44 +55,56 @@
         letter-spacing: 0.32em;
         font-size: 0.75rem;
         color: #94a3b8;
+        font-weight: 600;
       }
 
       h1 {
         margin: 0;
         font-size: clamp(2.4rem, 4vw, 3.6rem);
         color: #f8fafc;
+        font-weight: 700;
+        line-height: 1.2;
       }
 
       p {
         margin: 0;
         font-size: 1.05rem;
-        color: #cbd5f5;
-        line-height: 1.6;
+        color: #cbd5e1;
+        line-height: 1.7;
       }
 
       .actions {
         display: flex;
         flex-wrap: wrap;
         gap: 16px;
+        margin-top: 8px;
       }
 
       .button {
         text-decoration: none;
         font-weight: 600;
-        padding: 14px 26px;
+        padding: 14px 28px;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: all 0.2s ease;
         border: 1px solid transparent;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-family: inherit;
       }
 
       .button.primary {
-        background: #38bdf8;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
         color: #0f172a;
         box-shadow: 0 14px 32px rgba(56, 189, 248, 0.35);
+      }
+
+      .button.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 40px rgba(56, 189, 248, 0.45);
       }
 
       .button.secondary {
@@ -95,9 +113,10 @@
         border-color: rgba(148, 163, 184, 0.4);
       }
 
-      .button:hover {
+      .button.secondary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.4);
+        background: rgba(148, 163, 184, 0.1);
+        border-color: rgba(148, 163, 184, 0.6);
       }
 
       .details {
@@ -110,18 +129,27 @@
         background: rgba(30, 41, 59, 0.7);
         border: 1px solid rgba(148, 163, 184, 0.2);
         border-radius: 20px;
-        padding: 18px 20px;
+        padding: 24px 24px;
+        transition: all 0.3s ease;
+      }
+
+      .detail-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 12px 32px rgba(56, 189, 248, 0.15);
       }
 
       .detail-card h2 {
-        margin: 0 0 8px;
-        font-size: 1.1rem;
+        margin: 0 0 10px;
+        font-size: 1.15rem;
         color: #f1f5f9;
+        font-weight: 600;
       }
 
       .detail-card p {
         font-size: 0.95rem;
-        color: #cbd5f5;
+        color: #cbd5e1;
+        line-height: 1.6;
       }
 
       footer {
@@ -132,6 +160,8 @@
         justify-content: space-between;
         color: #94a3b8;
         font-size: 0.9rem;
+        padding-top: 8px;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
       }
 
       .footer-note {
@@ -144,33 +174,74 @@
         background: rgba(56, 189, 248, 0.15);
         color: #7dd3fc;
         border-radius: 999px;
-        padding: 4px 12px;
+        padding: 6px 14px;
         font-weight: 600;
         font-size: 0.75rem;
+        border: 1px solid rgba(56, 189, 248, 0.3);
       }
 
-      /* Asset-Ladeanzeige (unten rechts, nur visuell) */
+      .language-switcher {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 10000;
+        display: flex;
+        gap: 8px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 999px;
+        padding: 6px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.4);
+      }
+
+      .lang-btn {
+        appearance: none;
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+
+      .lang-btn:hover {
+        color: #e2e8f0;
+        background: rgba(148, 163, 184, 0.1);
+      }
+
+      .lang-btn.active {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+      }
+
       .asset-loader {
         position: fixed;
         right: 18px;
         bottom: 18px;
-        width: min(340px, calc(100vw - 36px));
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.22);
+        width: min(360px, calc(100vw - 36px));
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.25);
         border-radius: 18px;
-        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.55);
-        padding: 14px 14px 12px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.6);
+        padding: 16px 16px 14px;
         display: grid;
-        gap: 10px;
+        gap: 12px;
         z-index: 9999;
         opacity: 1;
         transform: translateY(0);
-        transition: opacity 220ms ease, transform 220ms ease;
+        transition: opacity 250ms ease, transform 250ms ease;
+        backdrop-filter: blur(10px);
       }
 
       .asset-loader.hidden {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(12px);
         pointer-events: none;
       }
 
@@ -178,18 +249,19 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 12px;
       }
 
       .asset-title {
         display: grid;
-        gap: 2px;
+        gap: 4px;
       }
 
       .asset-title strong {
         color: #f8fafc;
-        font-size: 0.95rem;
+        font-size: 0.98rem;
         line-height: 1.2;
+        font-weight: 600;
       }
 
       .asset-title span {
@@ -199,7 +271,7 @@
 
       .asset-actions {
         display: flex;
-        gap: 8px;
+        gap: 10px;
         align-items: center;
       }
 
@@ -209,24 +281,26 @@
         background: transparent;
         color: #e2e8f0;
         border-radius: 999px;
-        padding: 8px 10px;
+        padding: 8px 12px;
         font-weight: 600;
         font-size: 0.8rem;
         cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transition: all 0.15s ease;
+        font-family: inherit;
       }
 
       .skip-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.4);
+        background: rgba(148, 163, 184, 0.1);
+        border-color: rgba(148, 163, 184, 0.5);
       }
 
       .mini-spinner {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         border-radius: 999px;
         border: 2px solid rgba(148, 163, 184, 0.25);
-        border-top-color: rgba(56, 189, 248, 0.95);
+        border-top-color: #38bdf8;
         animation: spin 700ms linear infinite;
       }
 
@@ -247,8 +321,8 @@
       .asset-progress > div {
         height: 100%;
         width: 0%;
-        background: rgba(56, 189, 248, 0.95);
-        transition: width 180ms ease;
+        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        transition: width 200ms ease;
       }
 
       .asset-detail {
@@ -264,47 +338,51 @@
         background: rgba(56, 189, 248, 0.15);
         color: #7dd3fc;
         border-radius: 999px;
-        padding: 4px 10px;
+        padding: 5px 12px;
         font-weight: 700;
         font-size: 0.75rem;
+        border: 1px solid rgba(56, 189, 248, 0.3);
       }
 
       .support-panel {
         background: rgba(30, 41, 59, 0.75);
         border: 1px solid rgba(148, 163, 184, 0.2);
         border-radius: 20px;
-        padding: 28px clamp(18px, 4vw, 32px);
+        padding: 32px clamp(20px, 4vw, 36px);
         display: grid;
-        gap: 18px;
+        gap: 20px;
       }
 
       .support-panel h2 {
         margin: 0;
         color: #f8fafc;
-        font-size: 1.4rem;
+        font-size: 1.5rem;
+        font-weight: 600;
       }
 
       .support-panel p {
-        color: #cbd5f5;
-        font-size: 0.98rem;
+        color: #cbd5e1;
+        font-size: 1rem;
+        line-height: 1.6;
       }
 
       .support-form {
         display: grid;
-        gap: 16px;
+        gap: 18px;
       }
 
       .support-grid {
         display: grid;
-        gap: 14px;
+        gap: 16px;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       }
 
       .support-form label {
         font-size: 0.9rem;
-        color: #cbd5f5;
+        color: #cbd5e1;
         display: grid;
-        gap: 6px;
+        gap: 8px;
+        font-weight: 500;
       }
 
       .support-form select,
@@ -317,6 +395,16 @@
         background: rgba(15, 23, 42, 0.8);
         color: #e2e8f0;
         font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
+
+      .support-form select:focus,
+      .support-form input:focus,
+      .support-form textarea:focus {
+        outline: none;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
       }
 
       .support-form textarea {
@@ -327,146 +415,159 @@
       .support-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 14px;
         align-items: center;
       }
 
       .support-helper {
         font-size: 0.85rem;
         color: #94a3b8;
+        line-height: 1.5;
       }
 
       .support-panel[hidden] {
         display: none;
       }
 
-      .pinned-banner {
-        background: rgba(56, 189, 248, 0.12);
-        border: 1px solid rgba(56, 189, 248, 0.35);
-        border-radius: 18px;
-        padding: 18px 20px;
-        display: grid;
-        gap: 10px;
-      }
+      @media (max-width: 640px) {
+        body {
+          padding: 24px 16px;
+        }
 
-      .pinned-banner h2 {
-        margin: 0;
-        font-size: 1.1rem;
-        color: #e0f2fe;
-      }
+        main {
+          padding: 40px 24px;
+          gap: 32px;
+        }
 
-      .pinned-banner p {
-        margin: 0;
-        color: #e2e8f0;
-      }
+        h1 {
+          font-size: 2rem;
+        }
 
-      .pinned-banner a {
-        color: #7dd3fc;
-        font-weight: 600;
-        text-decoration: none;
+        .details {
+          grid-template-columns: 1fr;
+        }
+
+        footer {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+
+        .language-switcher {
+          top: 16px;
+          right: 16px;
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Asset-Ladeanzeige -->
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+      <button class="lang-btn active" data-lang="en" aria-label="Switch to English">EN</button>
+      <button class="lang-btn" data-lang="de" aria-label="Switch to German">DE</button>
+    </div>
+
+    <!-- Asset Loading Indicator -->
     <div class="asset-loader" id="assetLoader" aria-live="polite">
       <div class="asset-top">
         <div class="asset-title">
-          <strong>Assets werden geladen</strong>
-          <span id="assetSub">Initialisierung…</span>
+          <strong data-i18n="loader.title">Loading assets</strong>
+          <span id="assetSub" data-i18n="loader.initializing">Initializing…</span>
         </div>
         <div class="asset-actions">
-          <button class="skip-btn" id="skipBtn" type="button">Überspringen</button>
+          <button class="skip-btn" id="skipBtn" type="button" aria-label="Skip loading">
+            <span data-i18n="loader.skip">Skip</span>
+          </button>
           <div class="mini-spinner" aria-hidden="true"></div>
         </div>
       </div>
 
-      <div class="asset-progress" aria-hidden="true">
+      <div class="asset-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="assetBar"></div>
       </div>
 
       <div class="asset-detail">
-        <span id="assetCount">0 / 0</span>
+        <span id="assetCount">0 / 8</span>
         <span class="asset-badge" id="assetBadge">0%</span>
       </div>
     </div>
 
     <main>
-      <!-- PINNED MESSAGE: nur im HTML bearbeiten -->
-      <section class="pinned-banner" id="pinnedBanner">
-        <h2>Angeheftete Nachricht</h2>
-        <p id="pinnedMessage">XMENUUUUUU</p>
-        <a id="pinnedDownload" href="#" download="pinned-message.txt">.txt</a>
-      </section>
-
       <header>
-        <span class="eyebrow">XMenu Hauptseite</span>
-        <h1>Dein nächstes Ipad erlebnis beginnt mit XMenu.</h1>
-        <p></p>
+        <span class="eyebrow" data-i18n="header.eyebrow">XMenu Home</span>
+        <h1 data-i18n="header.title">Your next iPad experience starts with XMenu.</h1>
+        <p data-i18n="header.description">Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.</p>
         <div class="actions">
-          <a class="button primary" href="#">Download</a>
-          <a class="button secondary" href="mailto:support@xmenu.dev">Kontakt</a>
-          <button class="button secondary" id="supportToggle" type="button">
-            Tech Support
+          <a class="button primary" href="https://www.icloud.com/shortcuts/490d2848d8534f77bf4dbc6d6466af67" aria-label="Download XMenu">
+            <span data-i18n="header.download">Download</span>
+          </a>
+          <a class="button secondary" href="mailto:support@xmenu.dev" aria-label="Contact via email">
+            <span data-i18n="header.contact">Contact</span>
+          </a>
+          <button class="button secondary" id="supportToggle" type="button" aria-label="Open tech support">
+            <span data-i18n="header.support">Tech Support</span>
           </button>
         </div>
       </header>
 
       <section class="details">
         <div class="detail-card">
-          <h2>Startklar im Design</h2>
-          <p>Moderne Layouts für einen starken ersten Eindruck.</p>
+          <h2 data-i18n="features.design.title">Ready-to-go Design</h2>
+          <p data-i18n="features.design.description">Modern layouts for a strong first impression and intuitive operation.</p>
         </div>
         <div class="detail-card">
-          <h2>Schnelles Onboarding</h2>
-          <p>Einfache Einrichtung, sofort einsatzbereit.</p>
+          <h2 data-i18n="features.onboarding.title">Fast Onboarding</h2>
+          <p data-i18n="features.onboarding.description">Simple setup, ready to use immediately – without complicated configuration.</p>
         </div>
         <div class="detail-card">
-          <h2>Ständige Weiterentwicklung</h2>
-          <p>Regelmäßige Updates und neue Funktionen.</p>
+          <h2 data-i18n="features.development.title">Continuous Development</h2>
+          <p data-i18n="features.development.description">Regular updates and new features for the best user experience.</p>
         </div>
       </section>
 
       <section class="support-panel" id="supportPanel" hidden>
         <div>
-          <h2>Tech Support Anfrage</h2>
-          <p>
-            Wähle Gerätetyp, Marke und Modell aus und beschreibe dein Problem. Die Anfrage
-            wird per E-Mail an unser Support-Team gesendet.
+          <h2 data-i18n="support.title">Tech Support Request</h2>
+          <p data-i18n="support.description">
+            Select your device type, brand and model, and describe your problem. The request
+            will be sent via email to our support team.
           </p>
         </div>
         <form class="support-form" id="supportForm">
           <div class="support-grid">
             <label>
-              Gerätetyp
+              <span data-i18n="support.deviceType">Device Type</span>
               <select name="deviceType" required>
-                <option value="" disabled selected>Bitte wählen</option>
+                <option value="" disabled selected data-i18n="support.pleaseSelect">Please select</option>
                 <option value="Phone">Phone</option>
                 <option value="Laptop">Laptop</option>
                 <option value="iPad">iPad</option>
               </select>
             </label>
             <label>
-              Marke
-              <input name="brand" placeholder="z. B. Apple, Samsung, Dell" required />
+              <span data-i18n="support.brand">Brand</span>
+              <input name="brand" data-i18n-placeholder="support.brandPlaceholder" placeholder="e.g. Apple, Samsung, Dell" required />
             </label>
             <label>
-              Modell
-              <input name="model" placeholder="z. B. iPhone 14, XPS 13" required />
+              <span data-i18n="support.model">Model</span>
+              <input name="model" data-i18n-placeholder="support.modelPlaceholder" placeholder="e.g. iPhone 14, XPS 13" required />
             </label>
           </div>
           <label>
-            Beschreibe dein Problem
+            <span data-i18n="support.issue">Describe your problem</span>
             <textarea
               name="issue"
-              placeholder="Kurze Beschreibung des Problems…"
+              data-i18n-placeholder="support.issuePlaceholder"
+              placeholder="Brief description of the problem…"
               required
             ></textarea>
           </label>
           <div class="support-actions">
-            <button class="button primary" type="submit">Support anfragen</button>
-            <span class="support-helper">
-              Es öffnet sich dein E-Mail-Programm mit der fertigen Nachricht.
+            <button class="button primary" type="submit">
+              <span data-i18n="support.submit">Request Support</span>
+            </button>
+            <span class="support-helper" data-i18n="support.helper">
+              Your email program will open with the pre-filled message.
             </span>
           </div>
         </form>
@@ -474,46 +575,211 @@
 
       <footer>
         <div class="footer-note">
-          <span class="pill">Demnächst verfügbar</span>
-          <span>Patch 1.2.9</span>
+          <span class="pill" data-i18n="footer.comingSoon">Coming Soon</span>
+          <span data-i18n="footer.patch">Patch 1.2.7</span>
         </div>
-        <span>Kontakt: support@xmenu.dev</span>
+        <span data-i18n="footer.contact">Contact: support@xmenu.dev</span>
       </footer>
     </main>
 
     <script>
-      // NUR VISUELL: simuliertes Laden (jedes Element braucht 0,5s)
-      const assets = [
-        "Styles",
-        "Schriften",
-        "Layout",
-        "Icons",
-        "Bilder",
-        "Konfiguration",
-        "Komponenten",
-        "Footer",
-      ];
+      // Translation data
+      const translations = {
+        en: {
+          loader: {
+            title: "Loading assets",
+            initializing: "Initializing…",
+            loading: "Loading: {asset}…",
+            done: "Done.",
+            skip: "Skip"
+          },
+          header: {
+            eyebrow: "XMenu Home",
+            title: "Your next iPad experience starts with XMenu.",
+            description: "Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.",
+            download: "Download",
+            contact: "Contact",
+            support: "Tech Support",
+            supportClose: "Close"
+          },
+          features: {
+            design: {
+              title: "Ready-to-go Design",
+              description: "Modern layouts for a strong first impression and intuitive operation."
+            },
+            onboarding: {
+              title: "Fast Onboarding",
+              description: "Simple setup, ready to use immediately – without complicated configuration."
+            },
+            development: {
+              title: "Continuous Development",
+              description: "Regular updates and new features for the best user experience."
+            }
+          },
+          support: {
+            title: "Tech Support Request",
+            description: "Select your device type, brand and model, and describe your problem. The request will be sent via email to our support team.",
+            deviceType: "Device Type",
+            pleaseSelect: "Please select",
+            brand: "Brand",
+            brandPlaceholder: "e.g. Apple, Samsung, Dell",
+            model: "Model",
+            modelPlaceholder: "e.g. iPhone 14, XPS 13",
+            issue: "Describe your problem",
+            issuePlaceholder: "Brief description of the problem…",
+            submit: "Request Support",
+            helper: "Your email program will open with the pre-filled message."
+          },
+          footer: {
+            comingSoon: "Coming Soon",
+            patch: "Patch 1.2.7",
+            contact: "Contact: support@xmenu.dev"
+          },
+          assets: ["Styles", "Fonts", "Layout", "Icons", "Images", "Configuration", "Components", "Footer"]
+        },
+        de: {
+          loader: {
+            title: "Assets werden geladen",
+            initializing: "Initialisierung…",
+            loading: "Lade: {asset}…",
+            done: "Fertig.",
+            skip: "Überspringen"
+          },
+          header: {
+            eyebrow: "XMenu Hauptseite",
+            title: "Dein nächstes iPad Erlebnis beginnt mit XMenu.",
+            description: "Entdecke eine moderne Plattform, die Design und Funktionalität perfekt vereint. Mit XMenu wird dein iPad-Erlebnis auf ein neues Level gehoben.",
+            download: "Download",
+            contact: "Kontakt",
+            support: "Tech Support",
+            supportClose: "Schließen"
+          },
+          features: {
+            design: {
+              title: "Startklar im Design",
+              description: "Moderne Layouts für einen starken ersten Eindruck und intuitive Bedienung."
+            },
+            onboarding: {
+              title: "Schnelles Onboarding",
+              description: "Einfache Einrichtung, sofort einsatzbereit – ohne komplizierte Konfiguration."
+            },
+            development: {
+              title: "Ständige Weiterentwicklung",
+              description: "Regelmäßige Updates und neue Funktionen für das beste Nutzererlebnis."
+            }
+          },
+          support: {
+            title: "Tech Support Anfrage",
+            description: "Wähle deinen Gerätetyp, Marke und Modell aus und beschreibe dein Problem. Die Anfrage wird per E-Mail an unser Support-Team gesendet.",
+            deviceType: "Gerätetyp",
+            pleaseSelect: "Bitte wählen",
+            brand: "Marke",
+            brandPlaceholder: "z. B. Apple, Samsung, Dell",
+            model: "Modell",
+            modelPlaceholder: "z. B. iPhone 14, XPS 13",
+            issue: "Beschreibe dein Problem",
+            issuePlaceholder: "Kurze Beschreibung des Problems…",
+            submit: "Support anfragen",
+            helper: "Es öffnet sich dein E-Mail-Programm mit der vorausgefüllten Nachricht."
+          },
+          footer: {
+            comingSoon: "Demnächst verfügbar",
+            patch: "Patch 1.2.7",
+            contact: "Kontakt: support@xmenu.dev"
+          },
+          assets: ["Styles", "Schriften", "Layout", "Icons", "Bilder", "Konfiguration", "Komponenten", "Footer"]
+        }
+      };
 
+      let currentLang = 'en';
+      let currentAssets = translations[currentLang].assets;
+
+      // Translation function
+      function setLanguage(lang) {
+        currentLang = lang;
+        currentAssets = translations[lang].assets;
+        document.documentElement.lang = lang;
+
+        // Update all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+          const key = element.getAttribute('data-i18n');
+          const keys = key.split('.');
+          let value = translations[lang];
+          
+          for (const k of keys) {
+            value = value[k];
+          }
+          
+          if (value) {
+            element.textContent = value;
+          }
+        });
+
+        // Update placeholders
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+          const key = element.getAttribute('data-i18n-placeholder');
+          const keys = key.split('.');
+          let value = translations[lang];
+          
+          for (const k of keys) {
+            value = value[k];
+          }
+          
+          if (value) {
+            element.placeholder = value;
+          }
+        });
+
+        // Update select option
+        const selectOption = document.querySelector('select[name="deviceType"] option[disabled]');
+        if (selectOption) {
+          selectOption.textContent = translations[lang].support.pleaseSelect;
+        }
+
+        // Update language buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          if (btn.getAttribute('data-lang') === lang) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        // Save preference
+        localStorage.setItem('xmenu-lang', lang);
+      }
+
+      // Language switcher
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          setLanguage(lang);
+          
+          // If loader is still visible, update it
+          if (!done) {
+            render();
+          }
+        });
+      });
+
+      // Simulated asset loading (visual only, 0.5s per asset)
       const loader = document.getElementById("assetLoader");
       const sub = document.getElementById("assetSub");
       const bar = document.getElementById("assetBar");
       const count = document.getElementById("assetCount");
       const badge = document.getElementById("assetBadge");
       const skipBtn = document.getElementById("skipBtn");
+      const progressBar = loader.querySelector('.asset-progress');
 
       const supportToggle = document.getElementById("supportToggle");
       const supportPanel = document.getElementById("supportPanel");
       const supportForm = document.getElementById("supportForm");
 
-      const pinnedMessageEl = document.getElementById("pinnedMessage");
-      const pinnedDownload = document.getElementById("pinnedDownload");
-
       let index = 0;
       let done = false;
       let timerId = null;
-      let pinnedFileUrl = null;
 
-      const total = assets.length;
+      const total = currentAssets.length;
 
       const render = () => {
         const loaded = Math.min(index, total);
@@ -521,11 +787,12 @@
         count.textContent = `${loaded} / ${total}`;
         badge.textContent = `${pct}%`;
         bar.style.width = `${pct}%`;
+        progressBar.setAttribute('aria-valuenow', pct);
 
         if (!done && loaded < total) {
-          sub.textContent = `Lade: ${assets[loaded]}…`;
+          sub.textContent = translations[currentLang].loader.loading.replace('{asset}', currentAssets[loaded]);
         } else {
-          sub.textContent = "Fertig.";
+          sub.textContent = translations[currentLang].loader.done;
         }
       };
 
@@ -534,7 +801,7 @@
         done = true;
         index = total;
         render();
-        setTimeout(() => loader.classList.add("hidden"), 350);
+        setTimeout(() => loader.classList.add("hidden"), 400);
       };
 
       const start = () => {
@@ -560,9 +827,13 @@
         const isHidden = supportPanel.hasAttribute("hidden");
         if (isHidden) {
           supportPanel.removeAttribute("hidden");
-          supportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          supportToggle.querySelector('[data-i18n]').textContent = translations[currentLang].header.supportClose;
+          setTimeout(() => {
+            supportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 10);
         } else {
           supportPanel.setAttribute("hidden", "");
+          supportToggle.querySelector('[data-i18n]').textContent = translations[currentLang].header.support;
         }
       });
 
@@ -578,24 +849,17 @@
           `Tech Support: ${deviceType} - ${brand} ${model}`
         );
         const body = encodeURIComponent(
-          `Gerätetyp: ${deviceType}\nMarke: ${brand}\nModell: ${model}\n\nProblem:\n${issue}`
+          `${translations[currentLang].support.deviceType}: ${deviceType}\n${translations[currentLang].support.brand}: ${brand}\n${translations[currentLang].support.model}: ${model}\n\n${translations[currentLang].support.issue}:\n${issue}`
         );
 
         window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
       });
 
-      // .txt-Download für die angeheftete Nachricht (Text kommt aus dem HTML)
-      const buildPinnedDownload = () => {
-        const message = (pinnedMessageEl.textContent || "").trim();
-        const fileContent = `Angeheftete Nachricht\n\n${message}\n`;
-        const fileBlob = new Blob([fileContent], { type: "text/plain" });
+      // Load saved language preference or default to English
+      const savedLang = localStorage.getItem('xmenu-lang') || 'en';
+      setLanguage(savedLang);
 
-        if (pinnedFileUrl) URL.revokeObjectURL(pinnedFileUrl);
-        pinnedFileUrl = URL.createObjectURL(fileBlob);
-        pinnedDownload.href = pinnedFileUrl;
-      };
-
-      buildPinnedDownload();
+      // Start loading animation
       start();
     </script>
   </body>
