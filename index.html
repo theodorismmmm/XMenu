@@ -471,7 +471,7 @@
         <p data-i18n="header.description">Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.</p>
 
         <div class="actions">
-          <a class="button primary" href="https://www.icloud.com/shortcuts/490d2848d8534f77bf4dbc6d6466af67" aria-label="Download XMenu">
+          <a class="button primary" id="downloadBtn" href="https://www.icloud.com/shortcuts/490d2848d8534f77bf4dbc6d6466af67" aria-label="Download XMenu">
             <span data-i18n="header.download">Download</span>
           </a>
           <a class="button secondary" href="mailto:support@xmenu.dev" aria-label="Contact via email">
@@ -727,8 +727,20 @@
       const progressBar = loader.querySelector('.asset-progress');
 
       const supportToggle = document.getElementById("supportToggle");
+      const downloadBtn = document.getElementById("downloadBtn");
       const supportPanel = document.getElementById("supportPanel");
       const supportForm = document.getElementById("supportForm");
+
+      const loginRedirectUrl =
+        "https://accounts.xmenu.dev/?returnTo=" +
+        encodeURIComponent(window.location.href);
+
+      window.xmenuRequireAuth =
+        window.xmenuRequireAuth ||
+        (async () => {
+          window.location.href = loginRedirectUrl;
+          return false;
+        });
 
       let index = 0;
       let done = false;
@@ -778,7 +790,7 @@
         finish();
       });
 
-      supportToggle.addEventListener("click", () => {
+      const toggleSupportPanel = () => {
         const isHidden = supportPanel.hasAttribute("hidden");
         if (isHidden) {
           supportPanel.removeAttribute("hidden");
@@ -790,6 +802,19 @@
           supportPanel.setAttribute("hidden", "");
           supportToggle.querySelector('[data-i18n]').textContent = translations[currentLang].header.support;
         }
+      };
+
+      supportToggle.addEventListener("click", async () => {
+        const canAccess = await window.xmenuRequireAuth();
+        if (!canAccess) return;
+        toggleSupportPanel();
+      });
+
+      downloadBtn.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const canAccess = await window.xmenuRequireAuth();
+        if (!canAccess) return;
+        window.location.href = downloadBtn.href;
       });
 
       supportForm.addEventListener("submit", (event) => {
@@ -841,6 +866,15 @@
       async function renderAccount() {
         const { data } = await supabase.auth.getUser();
         const user = data.user;
+
+        window.xmenuRequireAuth = async () => {
+          const { data: authData } = await supabase.auth.getUser();
+          if (authData.user) return true;
+          window.location.href =
+            "https://accounts.xmenu.dev/?returnTo=" +
+            encodeURIComponent(window.location.href);
+          return false;
+        };
 
         if (!user) {
           label.style.display = "none";
