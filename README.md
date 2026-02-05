@@ -19,7 +19,7 @@ XMenu is an all‑in‑one iOS Shortcut built to streamline common tasks. It com
 
 ## 🚀 Get Started
 1. Install the shortcut via our website:  
-   https://www.xmenu.dev  
+   https://xmenu.dev  
 2. Open it in the Shortcuts app  
 3. (Optional) Add to Home Screen for one‑tap access  
 
