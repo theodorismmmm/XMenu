@@ -1,3 +1,4 @@
+<!-- xmenu.dev / index.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -304,11 +305,7 @@
         animation: spin 700ms linear infinite;
       }
 
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
+      @keyframes spin { to { transform: rotate(360deg); } }
 
       .asset-progress {
         height: 10px;
@@ -425,49 +422,24 @@
         line-height: 1.5;
       }
 
-      .support-panel[hidden] {
-        display: none;
-      }
+      .support-panel[hidden] { display: none; }
 
       @media (max-width: 640px) {
-        body {
-          padding: 24px 16px;
-        }
-
-        main {
-          padding: 40px 24px;
-          gap: 32px;
-        }
-
-        h1 {
-          font-size: 2rem;
-        }
-
-        .details {
-          grid-template-columns: 1fr;
-        }
-
-        footer {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 16px;
-        }
-
-        .language-switcher {
-          top: 16px;
-          right: 16px;
-        }
+        body { padding: 24px 16px; }
+        main { padding: 40px 24px; gap: 32px; }
+        h1 { font-size: 2rem; }
+        .details { grid-template-columns: 1fr; }
+        footer { flex-direction: column; align-items: flex-start; gap: 16px; }
+        .language-switcher { top: 16px; right: 16px; }
       }
     </style>
   </head>
   <body>
-    <!-- Language Switcher -->
     <div class="language-switcher">
       <button class="lang-btn active" data-lang="en" aria-label="Switch to English">EN</button>
       <button class="lang-btn" data-lang="de" aria-label="Switch to German">DE</button>
     </div>
 
-    <!-- Asset Loading Indicator -->
     <div class="asset-loader" id="assetLoader" aria-live="polite">
       <div class="asset-top">
         <div class="asset-title">
@@ -497,6 +469,7 @@
         <span class="eyebrow" data-i18n="header.eyebrow">XMenu Home</span>
         <h1 data-i18n="header.title">Your next iPad experience starts with XMenu.</h1>
         <p data-i18n="header.description">Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.</p>
+
         <div class="actions">
           <a class="button primary" href="https://www.icloud.com/shortcuts/490d2848d8534f77bf4dbc6d6466af67" aria-label="Download XMenu">
             <span data-i18n="header.download">Download</span>
@@ -507,7 +480,18 @@
           <button class="button secondary" id="supportToggle" type="button" aria-label="Open tech support">
             <span data-i18n="header.support">Tech Support</span>
           </button>
+
+          <!-- ADDED (Step 4.2): login/register button -->
+          <a class="button secondary"
+             id="accountBtn"
+             href="https://accounts.xmenu.dev/?returnTo=https%3A%2F%2Fxmenu.dev%2F"
+             aria-label="Login or register">
+            Login / Register
+          </a>
         </div>
+
+        <!-- ADDED: label for name -->
+        <p id="signedInLabel" style="display:none; margin-top:10px; color:#cbd5e1;"></p>
       </header>
 
       <section class="details">
@@ -694,75 +678,46 @@
       let currentLang = 'en';
       let currentAssets = translations[currentLang].assets;
 
-      // Translation function
       function setLanguage(lang) {
         currentLang = lang;
         currentAssets = translations[lang].assets;
         document.documentElement.lang = lang;
 
-        // Update all elements with data-i18n attribute
         document.querySelectorAll('[data-i18n]').forEach(element => {
           const key = element.getAttribute('data-i18n');
           const keys = key.split('.');
           let value = translations[lang];
-          
-          for (const k of keys) {
-            value = value[k];
-          }
-          
-          if (value) {
-            element.textContent = value;
-          }
+          for (const k of keys) value = value[k];
+          if (value) element.textContent = value;
         });
 
-        // Update placeholders
         document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
           const key = element.getAttribute('data-i18n-placeholder');
           const keys = key.split('.');
           let value = translations[lang];
-          
-          for (const k of keys) {
-            value = value[k];
-          }
-          
-          if (value) {
-            element.placeholder = value;
-          }
+          for (const k of keys) value = value[k];
+          if (value) element.placeholder = value;
         });
 
-        // Update select option
         const selectOption = document.querySelector('select[name="deviceType"] option[disabled]');
-        if (selectOption) {
-          selectOption.textContent = translations[lang].support.pleaseSelect;
-        }
+        if (selectOption) selectOption.textContent = translations[lang].support.pleaseSelect;
 
-        // Update language buttons
         document.querySelectorAll('.lang-btn').forEach(btn => {
-          if (btn.getAttribute('data-lang') === lang) {
-            btn.classList.add('active');
-          } else {
-            btn.classList.remove('active');
-          }
+          if (btn.getAttribute('data-lang') === lang) btn.classList.add('active');
+          else btn.classList.remove('active');
         });
 
-        // Save preference
         localStorage.setItem('xmenu-lang', lang);
       }
 
-      // Language switcher
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const lang = btn.getAttribute('data-lang');
           setLanguage(lang);
-          
-          // If loader is still visible, update it
-          if (!done) {
-            render();
-          }
+          if (!done) render();
         });
       });
 
-      // Simulated asset loading (visual only, 0.5s per asset)
       const loader = document.getElementById("assetLoader");
       const sub = document.getElementById("assetSub");
       const bar = document.getElementById("assetBar");
@@ -855,12 +810,71 @@
         window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
       });
 
-      // Load saved language preference or default to English
       const savedLang = localStorage.getItem('xmenu-lang') || 'en';
       setLanguage(savedLang);
-
-      // Start loading animation
       start();
+    </script>
+
+    <!-- ADDED (Step 4.3): Supabase auth + name display -->
+    <script type="module">
+      import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+      const SUPABASE_URL = "https://miivgganhzzqfzebmaxx.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1paXZnZ2FuaHp6cWZ6ZWJtYXh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTg0OTYsImV4cCI6MjA4NTg3NDQ5Nn0.WAB1I8f8B46WzgvTqNn_jFiMBUb-63LPtCpCMrAkCoY";
+
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const label = document.getElementById("signedInLabel");
+      const accountBtn = document.getElementById("accountBtn");
+
+      async function ensureProfileRow(userId) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (data) return;
+        await supabase.from("profiles").insert({ user_id: userId, display_name: "" });
+      }
+
+      async function renderAccount() {
+        const { data } = await supabase.auth.getUser();
+        const user = data.user;
+
+        if (!user) {
+          label.style.display = "none";
+          accountBtn.textContent = "Login / Register";
+          accountBtn.href =
+            "https://accounts.xmenu.dev/?returnTo=" +
+            encodeURIComponent("https://xmenu.dev/");
+          return;
+        }
+
+        await ensureProfileRow(user.id);
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        const name = (profile?.display_name || "").trim() || user.email || "User";
+
+        label.textContent = "Signed in as: " + name;
+        label.style.display = "block";
+
+        accountBtn.textContent = "Account Settings";
+        accountBtn.href =
+          "https://accounts.xmenu.dev/?returnTo=" +
+          encodeURIComponent("https://xmenu.dev/");
+      }
+
+      supabase.auth.onAuthStateChange(() => {
+        renderAccount();
+      });
+
+      renderAccount();
     </script>
   </body>
 </html>
