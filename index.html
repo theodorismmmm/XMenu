@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XMenu - Your iPad Experience</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -488,6 +488,14 @@
              aria-label="Login or register">
             Login / Register
           </a>
+
+          <!-- NEW: Releases button -->
+          <a class="button secondary"
+             id="releasesBtn"
+             href="https://rls.xmenu.dev"
+             aria-label="Releases">
+            Releases
+          </a>
         </div>
 
         <!-- ADDED: label for name -->
@@ -829,7 +837,7 @@
           `Tech Support: ${deviceType} - ${brand} ${model}`
         );
         const body = encodeURIComponent(
-          `${translations[currentLang].support.deviceType}: ${deviceType}\n${translations[currentLang].support.brand}: ${brand}\n${translations[currentLang].support.model}: ${model}\n\n${translations[currentLang].support.issue}:\n${issue}`
+          `${translations[currentLang].support.deviceType}: ${deviceType}\n${translations[currentLang].support.brand}: ${brand}\n${translations[currentLang].support.model}: ${model}\n\n${translations[[...]
         );
 
         window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
@@ -845,7 +853,7 @@
       import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
       const SUPABASE_URL = "https://miivgganhzzqfzebmaxx.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1paXZnZ2FuaHp6cWZ6ZWJtYXh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTg0OTYsImV4cCI6MjA4NTg3NDQ5Nn0.WAB1I8f8B46WzgvTqNn_jFiMBUb-63LPtCpCMrAkCoY";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1paXZnZ2FuaHp6cWZ6ZWJtYXh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTg0OTYsImV4cCI6MjA4NTg3NDQ5Nn0.WA[...]";
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
