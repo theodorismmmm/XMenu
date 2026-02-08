@@ -1,13 +1,16 @@
-<!-- xmenu.dev / index.html -->
+<!-- xmenu.dev / index.html (entire corrected file) -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XMenu - Your iPad Experience</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         color-scheme: dark;
@@ -305,7 +308,11 @@
         animation: spin 700ms linear infinite;
       }
 
-      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
       .asset-progress {
         height: 10px;
@@ -422,21 +429,41 @@
         line-height: 1.5;
       }
 
-      .support-panel[hidden] { display: none; }
+      .support-panel[hidden] {
+        display: none;
+      }
 
       @media (max-width: 640px) {
-        body { padding: 24px 16px; }
-        main { padding: 40px 24px; gap: 32px; }
-        h1 { font-size: 2rem; }
-        .details { grid-template-columns: 1fr; }
-        footer { flex-direction: column; align-items: flex-start; gap: 16px; }
-        .language-switcher { top: 16px; right: 16px; }
+        body {
+          padding: 24px 16px;
+        }
+        main {
+          padding: 40px 24px;
+          gap: 32px;
+        }
+        h1 {
+          font-size: 2rem;
+        }
+        .details {
+          grid-template-columns: 1fr;
+        }
+        footer {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+        .language-switcher {
+          top: 16px;
+          right: 16px;
+        }
       }
     </style>
   </head>
   <body>
     <div class="language-switcher">
-      <button class="lang-btn active" data-lang="en" aria-label="Switch to English">EN</button>
+      <button class="lang-btn active" data-lang="en" aria-label="Switch to English">
+        EN
+      </button>
       <button class="lang-btn" data-lang="de" aria-label="Switch to German">DE</button>
     </div>
 
@@ -454,7 +481,13 @@
         </div>
       </div>
 
-      <div class="asset-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div
+        class="asset-progress"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
         <div id="assetBar"></div>
       </div>
 
@@ -468,10 +501,18 @@
       <header>
         <span class="eyebrow" data-i18n="header.eyebrow">XMenu Home</span>
         <h1 data-i18n="header.title">Your next iPad experience starts with XMenu.</h1>
-        <p data-i18n="header.description">Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.</p>
+        <p data-i18n="header.description">
+          Discover a modern platform that perfectly combines design and functionality.
+          XMenu takes your iPad experience to the next level.
+        </p>
 
         <div class="actions">
-          <a class="button primary" id="downloadBtn" href="https://www.icloud.com/shortcuts/490d2848d8534f77bf4dbc6d6466af67" aria-label="Download XMenu">
+          <a
+            class="button primary"
+            id="downloadBtn"
+            href="https://www.icloud.com/shortcuts/490d2848d8534f77bf4dbc6d6466af67"
+            aria-label="Download XMenu"
+          >
             <span data-i18n="header.download">Download</span>
           </a>
           <a class="button secondary" href="mailto:support@xmenu.dev" aria-label="Contact via email">
@@ -481,39 +522,41 @@
             <span data-i18n="header.support">Tech Support</span>
           </button>
 
-          <!-- ADDED (Step 4.2): login/register button -->
-          <a class="button secondary"
-             id="accountBtn"
-             href="https://accounts.xmenu.dev/?returnTo=https%3A%2F%2Fxmenu.dev%2F"
-             aria-label="Login or register">
+          <a
+            class="button secondary"
+            id="accountBtn"
+            href="https://accounts.xmenu.dev/?returnTo=https%3A%2F%2Fxmenu.dev%2F"
+            aria-label="Login or register"
+          >
             Login / Register
           </a>
 
-          <!-- NEW: Releases button -->
-          <a class="button secondary"
-             id="releasesBtn"
-             href="https://rls.xmenu.dev"
-             aria-label="Releases">
+          <a class="button secondary" id="releasesBtn" href="https://rls.xmenu.dev" aria-label="Releases">
             Releases
           </a>
         </div>
 
-        <!-- ADDED: label for name -->
-        <p id="signedInLabel" style="display:none; margin-top:10px; color:#cbd5e1;"></p>
+        <p id="signedInLabel" style="display: none; margin-top: 10px; color: #cbd5e1;"></p>
       </header>
 
       <section class="details">
         <div class="detail-card">
           <h2 data-i18n="features.design.title">Ready-to-go Design</h2>
-          <p data-i18n="features.design.description">Modern layouts for a strong first impression and intuitive operation.</p>
+          <p data-i18n="features.design.description">
+            Modern layouts for a strong first impression and intuitive operation.
+          </p>
         </div>
         <div class="detail-card">
           <h2 data-i18n="features.onboarding.title">Fast Onboarding</h2>
-          <p data-i18n="features.onboarding.description">Simple setup, ready to use immediately – without complicated configuration.</p>
+          <p data-i18n="features.onboarding.description">
+            Simple setup, ready to use immediately – without complicated configuration.
+          </p>
         </div>
         <div class="detail-card">
           <h2 data-i18n="features.development.title">Continuous Development</h2>
-          <p data-i18n="features.development.description">Regular updates and new features for the best user experience.</p>
+          <p data-i18n="features.development.description">
+            Regular updates and new features for the best user experience.
+          </p>
         </div>
       </section>
 
@@ -538,11 +581,21 @@
             </label>
             <label>
               <span data-i18n="support.brand">Brand</span>
-              <input name="brand" data-i18n-placeholder="support.brandPlaceholder" placeholder="e.g. Apple, Samsung, Dell" required />
+              <input
+                name="brand"
+                data-i18n-placeholder="support.brandPlaceholder"
+                placeholder="e.g. Apple, Samsung, Dell"
+                required
+              />
             </label>
             <label>
               <span data-i18n="support.model">Model</span>
-              <input name="model" data-i18n-placeholder="support.modelPlaceholder" placeholder="e.g. iPhone 14, XPS 13" required />
+              <input
+                name="model"
+                data-i18n-placeholder="support.modelPlaceholder"
+                placeholder="e.g. iPhone 14, XPS 13"
+                required
+              />
             </label>
           </div>
           <label>
@@ -588,7 +641,8 @@
           header: {
             eyebrow: "XMenu Home",
             title: "Your next iPad experience starts with XMenu.",
-            description: "Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.",
+            description:
+              "Discover a modern platform that perfectly combines design and functionality. XMenu takes your iPad experience to the next level.",
             download: "Download",
             contact: "Contact",
             support: "Tech Support",
@@ -597,20 +651,24 @@
           features: {
             design: {
               title: "Ready-to-go Design",
-              description: "Modern layouts for a strong first impression and intuitive operation."
+              description:
+                "Modern layouts for a strong first impression and intuitive operation."
             },
             onboarding: {
               title: "Fast Onboarding",
-              description: "Simple setup, ready to use immediately – without complicated configuration."
+              description:
+                "Simple setup, ready to use immediately – without complicated configuration."
             },
             development: {
               title: "Continuous Development",
-              description: "Regular updates and new features for the best user experience."
+              description:
+                "Regular updates and new features for the best user experience."
             }
           },
           support: {
             title: "Tech Support Request",
-            description: "Select your device type, brand and model, and describe your problem. The request will be sent via email to our support team.",
+            description:
+              "Select your device type, brand and model, and describe your problem. The request will be sent via email to our support team.",
             deviceType: "Device Type",
             pleaseSelect: "Please select",
             brand: "Brand",
@@ -627,7 +685,16 @@
             patch: "Patch 1.2.7",
             contact: "Contact: support@xmenu.dev"
           },
-          assets: ["Styles", "Fonts", "Layout", "Icons", "Images", "Configuration", "Components", "Footer"]
+          assets: [
+            "Styles",
+            "Fonts",
+            "Layout",
+            "Icons",
+            "Images",
+            "Configuration",
+            "Components",
+            "Footer"
+          ]
         },
         de: {
           loader: {
@@ -640,7 +707,8 @@
           header: {
             eyebrow: "XMenu Hauptseite",
             title: "Dein nächstes iPad Erlebnis beginnt mit XMenu.",
-            description: "Entdecke eine moderne Plattform, die Design und Funktionalität perfekt vereint. Mit XMenu wird dein iPad-Erlebnis auf ein neues Level gehoben.",
+            description:
+              "Entdecke eine moderne Plattform, die Design und Funktionalität perfekt vereint. Mit XMenu wird dein iPad-Erlebnis auf ein neues Level gehoben.",
             download: "Download",
             contact: "Kontakt",
             support: "Tech Support",
@@ -649,20 +717,24 @@
           features: {
             design: {
               title: "Startklar im Design",
-              description: "Moderne Layouts für einen starken ersten Eindruck und intuitive Bedienung."
+              description:
+                "Moderne Layouts für einen starken ersten Eindruck und intuitive Bedienung."
             },
             onboarding: {
               title: "Schnelles Onboarding",
-              description: "Einfache Einrichtung, sofort einsatzbereit – ohne komplizierte Konfiguration."
+              description:
+                "Einfache Einrichtung, sofort einsatzbereit – ohne komplizierte Konfiguration."
             },
             development: {
               title: "Ständige Weiterentwicklung",
-              description: "Regelmäßige Updates und neue Funktionen für das beste Nutzererlebnis."
+              description:
+                "Regelmäßige Updates und neue Funktionen für das beste Nutzererlebnis."
             }
           },
           support: {
             title: "Tech Support Anfrage",
-            description: "Wähle deinen Gerätetyp, Marke und Modell aus und beschreibe dein Problem. Die Anfrage wird per E-Mail an unser Support-Team gesendet.",
+            description:
+              "Wähle deinen Gerätetyp, Marke und Modell aus und beschreibe dein Problem. Die Anfrage wird per E-Mail an unser Support-Team gesendet.",
             deviceType: "Gerätetyp",
             pleaseSelect: "Bitte wählen",
             brand: "Marke",
@@ -672,55 +744,61 @@
             issue: "Beschreibe dein Problem",
             issuePlaceholder: "Kurze Beschreibung des Problems…",
             submit: "Support anfragen",
-            helper: "Es öffnet sich dein E-Mail-Programm mit der vorausgefüllten Nachricht."
+            helper:
+              "Es öffnet sich dein E-Mail-Programm mit der vorausgefüllten Nachricht."
           },
           footer: {
             comingSoon: "Demnächst verfügbar",
             patch: "Patch 1.2.9",
             contact: "Kontakt: support@xmenu.dev"
           },
-          assets: ["Styles", "Schriften", "Layout", "Icons", "Bilder", "Konfiguration", "Komponenten", "Footer"]
+          assets: [
+            "Styles",
+            "Schriften",
+            "Layout",
+            "Icons",
+            "Bilder",
+            "Konfiguration",
+            "Komponenten",
+            "Footer"
+          ]
         }
       };
 
-      let currentLang = 'en';
+      let currentLang = "en";
       let currentAssets = translations[currentLang].assets;
 
       function setLanguage(lang) {
-        currentLang = lang;
-        currentAssets = translations[lang].assets;
-        document.documentElement.lang = lang;
+        currentLang = translations[lang] ? lang : "en";
+        currentAssets = translations[currentLang].assets;
+        document.documentElement.lang = currentLang;
 
-        document.querySelectorAll('[data-i18n]').forEach(element => {
-          const key = element.getAttribute('data-i18n');
-          const keys = key.split('.');
-          let value = translations[lang];
-          for (const k of keys) value = value[k];
-          if (value) element.textContent = value;
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.getAttribute("data-i18n");
+          const keys = key.split(".");
+          let value = translations[currentLang];
+          for (const k of keys) value = value?.[k];
+          if (typeof value === "string") element.textContent = value;
         });
 
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-          const key = element.getAttribute('data-i18n-placeholder');
-          const keys = key.split('.');
-          let value = translations[lang];
-          for (const k of keys) value = value[k];
-          if (value) element.placeholder = value;
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+          const key = element.getAttribute("data-i18n-placeholder");
+          const keys = key.split(".");
+          let value = translations[currentLang];
+          for (const k of keys) value = value?.[k];
+          if (typeof value === "string") element.placeholder = value;
         });
 
-        const selectOption = document.querySelector('select[name="deviceType"] option[disabled]');
-        if (selectOption) selectOption.textContent = translations[lang].support.pleaseSelect;
-
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-          if (btn.getAttribute('data-lang') === lang) btn.classList.add('active');
-          else btn.classList.remove('active');
+        document.querySelectorAll(".lang-btn").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-lang") === currentLang);
         });
 
-        localStorage.setItem('xmenu-lang', lang);
+        localStorage.setItem("xmenu-lang", currentLang);
       }
 
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lang = btn.getAttribute('data-lang');
+      document.querySelectorAll(".lang-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const lang = btn.getAttribute("data-lang");
           setLanguage(lang);
           if (!done) render();
         });
@@ -732,7 +810,7 @@
       const count = document.getElementById("assetCount");
       const badge = document.getElementById("assetBadge");
       const skipBtn = document.getElementById("skipBtn");
-      const progressBar = loader.querySelector('.asset-progress');
+      const progressBar = loader.querySelector(".asset-progress");
 
       const supportToggle = document.getElementById("supportToggle");
       const downloadBtn = document.getElementById("downloadBtn");
@@ -740,8 +818,7 @@
       const supportForm = document.getElementById("supportForm");
 
       const loginRedirectUrl =
-        "https://accounts.xmenu.dev/?returnTo=" +
-        encodeURIComponent(window.location.href);
+        "https://accounts.xmenu.dev/?returnTo=" + encodeURIComponent(window.location.href);
 
       window.xmenuRequireAuth =
         window.xmenuRequireAuth ||
@@ -754,39 +831,44 @@
       let done = false;
       let timerId = null;
 
-      const total = currentAssets.length;
+      const getTotal = () => (Array.isArray(currentAssets) ? currentAssets.length : 0);
 
       const render = () => {
+        const total = getTotal();
         const loaded = Math.min(index, total);
         const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
+
         count.textContent = `${loaded} / ${total}`;
         badge.textContent = `${pct}%`;
         bar.style.width = `${pct}%`;
-        progressBar.setAttribute('aria-valuenow', pct);
+        progressBar.setAttribute("aria-valuenow", String(pct));
+
+        const t = translations[currentLang];
 
         if (!done && loaded < total) {
-          sub.textContent = translations[currentLang].loader.loading.replace('{asset}', currentAssets[loaded]);
+          const assetName = currentAssets[loaded] ?? "";
+          sub.textContent = t.loader.loading.replace("{asset}", assetName);
         } else {
-          sub.textContent = translations[currentLang].loader.done;
+          sub.textContent = t.loader.done;
         }
       };
 
       const finish = () => {
         if (done) return;
         done = true;
-        index = total;
+        index = getTotal();
         render();
         setTimeout(() => loader.classList.add("hidden"), 400);
       };
 
       const start = () => {
         render();
-        if (total === 0) return finish();
+        if (getTotal() === 0) return finish();
 
         timerId = setInterval(() => {
           index += 1;
           render();
-          if (index >= total) {
+          if (index >= getTotal()) {
             clearInterval(timerId);
             finish();
           }
@@ -800,15 +882,17 @@
 
       const toggleSupportPanel = () => {
         const isHidden = supportPanel.hasAttribute("hidden");
+        const t = translations[currentLang];
+
         if (isHidden) {
           supportPanel.removeAttribute("hidden");
-          supportToggle.querySelector('[data-i18n]').textContent = translations[currentLang].header.supportClose;
+          supportToggle.querySelector("[data-i18n]").textContent = t.header.supportClose;
           setTimeout(() => {
             supportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 10);
         } else {
           supportPanel.setAttribute("hidden", "");
-          supportToggle.querySelector('[data-i18n]').textContent = translations[currentLang].header.support;
+          supportToggle.querySelector("[data-i18n]").textContent = t.header.support;
         }
       };
 
@@ -827,33 +911,40 @@
 
       supportForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const formData = new FormData(supportForm);
-        const deviceType = formData.get("deviceType");
-        const brand = formData.get("brand");
-        const model = formData.get("model");
-        const issue = formData.get("issue");
 
-        const subject = encodeURIComponent(
-          `Tech Support: ${deviceType} - ${brand} ${model}`
-        );
-        const body = encodeURIComponent(
-          `${translations[currentLang].support.deviceType}: ${deviceType}\n${translations[currentLang].support.brand}: ${brand}\n${translations[currentLang].support.model}: ${model}\n\n${translations[[...]
-        );
+        const t = translations[currentLang];
+        const formData = new FormData(supportForm);
+
+        const deviceType = String(formData.get("deviceType") || "");
+        const brand = String(formData.get("brand") || "");
+        const model = String(formData.get("model") || "");
+        const issue = String(formData.get("issue") || "");
+
+        const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
+
+        const bodyLines = [
+          `${t.support.deviceType}: ${deviceType}`,
+          `${t.support.brand}: ${brand}`,
+          `${t.support.model}: ${model}`,
+          "",
+          issue
+        ];
+        const body = encodeURIComponent(bodyLines.join("\n"));
 
         window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
       });
 
-      const savedLang = localStorage.getItem('xmenu-lang') || 'en';
+      const savedLang = localStorage.getItem("xmenu-lang") || "en";
       setLanguage(savedLang);
       start();
     </script>
 
-    <!-- ADDED (Step 4.3): Supabase auth + name display -->
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
       const SUPABASE_URL = "https://miivgganhzzqfzebmaxx.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1paXZnZ2FuaHp6cWZ6ZWJtYXh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTg0OTYsImV4cCI6MjA4NTg3NDQ5Nn0.WA[...]";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1paXZnZ2FuaHp6cWZ6ZWJtYXh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTg0OTYsImV4cCI6MjA4NTg3NDQ5Nn0.WA[...]";
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
