@@ -27,6 +27,11 @@
           const currentUrl = encodeURIComponent(window.location.href);
           window.location.href = "https://security.xmenu.dev?returnTo=" + currentUrl;
         } else if (urlParams.get('verified')) {
+          // User just came back from security.xmenu.dev – set a 1-hour cookie so the
+          // site stays unlocked for this user without requiring re-verification.
+          const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString();
+          document.cookie = "xmenu_security_verified=true; expires=" + expires + "; path=/; Secure; SameSite=Lax";
+
           // Clean up verification parameter while preserving other params
           urlParams.delete('verified');
           const search = urlParams.toString();

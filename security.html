@@ -346,8 +346,9 @@
           const urlParams = new URLSearchParams(window.location.search);
           const returnTo = urlParams.get("returnTo") || "https://xmenu.dev/";
 
-          // Redirect to main site
-          window.location.href = returnTo;
+          // Redirect to main site with verified flag so it can set the 1-hour cookie
+          const separator = returnTo.includes("?") ? "&" : "?";
+          window.location.href = returnTo + separator + "verified=true";
         } else {
           // Incorrect answer
           attempts++;
@@ -387,10 +388,11 @@
       const now = Date.now();
 
       if (isVerified && now < verificationExpiry) {
-        // Already verified, redirect to home
+        // Already verified, redirect to home with verified flag so it can set the 1-hour cookie
         const urlParams = new URLSearchParams(window.location.search);
         const returnTo = urlParams.get("returnTo") || "https://xmenu.dev/";
-        window.location.href = returnTo;
+        const separator = returnTo.includes("?") ? "&" : "?";
+        window.location.href = returnTo + separator + "verified=true";
       }
     </script>
   </body>
