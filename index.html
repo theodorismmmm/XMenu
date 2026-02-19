@@ -6,18 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XMenu - Your iPad Experience</title>
     <script>
-      // Anti-bot security verification check
+      // Redirect to external security verification
       (function() {
-        const isVerified = sessionStorage.getItem("xmenu_verified") === "true";
-        const verificationExpiry = parseInt(sessionStorage.getItem("xmenu_verification_expiry") || "0");
-        const now = Date.now();
-
-        // Check if user is verified and verification hasn't expired
-        if (!isVerified || now >= verificationExpiry) {
-          // Not verified or verification expired, redirect to security page
-          const currentUrl = encodeURIComponent(window.location.href);
-          window.location.href = "security.html?returnTo=" + currentUrl;
-        }
+        window.location.href = "https://security.xmenu.dev";
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
