@@ -8,7 +8,8 @@
     <script>
       // Redirect to external security verification
       (function() {
-        window.location.href = "https://security.xmenu.dev";
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = "https://security.xmenu.dev?returnTo=" + currentUrl;
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
