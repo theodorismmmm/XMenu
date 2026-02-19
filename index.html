@@ -8,8 +8,20 @@
     <script>
       // Redirect to external security verification
       (function() {
-        const currentUrl = encodeURIComponent(window.location.href);
-        window.location.href = "https://security.xmenu.dev?returnTo=" + currentUrl;
+        // Check if user was just verified (via URL parameter or cookie)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isVerified = urlParams.get('verified') === 'true' || 
+                          document.cookie.includes('xmenu_security_verified=true');
+        
+        if (!isVerified) {
+          // Not verified, redirect to security service
+          const currentUrl = encodeURIComponent(window.location.href);
+          window.location.href = "https://security.xmenu.dev?returnTo=" + currentUrl;
+        } else if (urlParams.get('verified')) {
+          // Clean up URL parameter if present
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
