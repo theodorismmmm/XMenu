@@ -5,6 +5,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XMenu - Your iPad Experience</title>
+    <script>
+      // Anti-bot security verification check
+      (function() {
+        const isVerified = sessionStorage.getItem("xmenu_verified") === "true";
+        const verificationExpiry = parseInt(sessionStorage.getItem("xmenu_verification_expiry") || "0");
+        const now = Date.now();
+
+        // Check if user is verified and verification hasn't expired
+        if (!isVerified || now >= verificationExpiry) {
+          // Not verified or verification expired, redirect to security page
+          const currentUrl = encodeURIComponent(window.location.href);
+          window.location.href = "security.html?returnTo=" + currentUrl;
+        }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
