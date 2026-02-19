@@ -530,7 +530,7 @@
             <circle class="countdown-track" cx="40" cy="40" r="35"/>
             <circle class="countdown-progress" id="countdownRing" cx="40" cy="40" r="35"/>
           </svg>
-          <div class="countdown-number" id="countdownNum">3</div>
+          <div class="countdown-number" id="countdownNum">10</div>
         </div>
 
         <button type="button" class="skip-btn" id="skipBtn">
@@ -696,7 +696,7 @@
         }, 500);
       }
 
-      // ── Pre-check countdown (3 seconds) ──────────────────────────────────────
+      // ── Pre-check countdown (10 seconds) ─────────────────────────────────────
       // If user is already verified via sessionStorage, skip the pre-check
       (function redirectIfAlreadyVerified() {
         const isVerified      = sessionStorage.getItem("xmenu_verified") === "true";
@@ -708,7 +708,7 @@
         }
       })();
 
-      let countdownValue   = 3;
+      let countdownValue   = 10;
       let activeInterval   = null;  // single shared reference prevents duplicate intervals
 
       // Initialize ring to full circle
@@ -720,8 +720,8 @@
           countdownValue--;
           countdownNum.textContent = countdownValue;
 
-          // Shrink the ring: offset goes from 0 → RING_CIRCUMF over 3 steps
-          const offset = ((3 - countdownValue) / 3) * RING_CIRCUMF;
+          // Shrink the ring: offset goes from 0 → RING_CIRCUMF over 10 steps
+          const offset = ((10 - countdownValue) / 10) * RING_CIRCUMF;
           countdownRing.style.strokeDashoffset = offset.toString();
 
           if (countdownValue <= 0) {
