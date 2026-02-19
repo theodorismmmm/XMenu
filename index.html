@@ -8,18 +8,30 @@
     <script>
       // Redirect to external security verification
       (function() {
+        // Helper function to safely get cookie value
+        function getCookie(name) {
+          const value = "; " + document.cookie;
+          const parts = value.split("; " + name + "=");
+          if (parts.length === 2) return parts.pop().split(";").shift();
+          return null;
+        }
+        
         // Check if user was just verified (via URL parameter or cookie)
         const urlParams = new URLSearchParams(window.location.search);
         const isVerified = urlParams.get('verified') === 'true' || 
-                          document.cookie.includes('xmenu_security_verified=true');
+                          getCookie('xmenu_security_verified') === 'true';
         
         if (!isVerified) {
           // Not verified, redirect to security service
+          // Note: The external service must validate returnTo against an allowlist
           const currentUrl = encodeURIComponent(window.location.href);
           window.location.href = "https://security.xmenu.dev?returnTo=" + currentUrl;
         } else if (urlParams.get('verified')) {
-          // Clean up URL parameter if present
-          const cleanUrl = window.location.origin + window.location.pathname;
+          // Clean up verification parameter while preserving other params
+          urlParams.delete('verified');
+          const search = urlParams.toString();
+          const cleanUrl = window.location.origin + window.location.pathname + 
+                          (search ? '?' + search : '') + window.location.hash;
           window.history.replaceState({}, document.title, cleanUrl);
         }
       })();
