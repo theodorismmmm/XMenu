@@ -501,6 +501,232 @@
         line-height: 1.5;
       }
 
+      /* ── Discount code field ── */
+      .discount-code-row {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .discount-code-row input {
+        flex: 1;
+      }
+
+      .apply-code-btn {
+        padding: 12px 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: transparent;
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        white-space: nowrap;
+      }
+
+      .apply-code-btn:hover {
+        background: rgba(148, 163, 184, 0.1);
+        border-color: rgba(148, 163, 184, 0.6);
+      }
+
+      .code-feedback {
+        font-size: 0.85rem;
+        margin-top: 6px;
+        min-height: 18px;
+        display: block;
+      }
+
+      .code-feedback.success { color: #4ade80; }
+      .code-feedback.error   { color: #f87171; }
+
+      /* ── Secret code modal ── */
+      .secret-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10002;
+        backdrop-filter: blur(4px);
+      }
+
+      .secret-modal-overlay.visible {
+        display: flex;
+      }
+
+      .secret-modal-box {
+        background: rgba(15, 23, 42, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 18px;
+        padding: 28px 28px 22px;
+        width: min(360px, calc(100vw - 40px));
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+        display: grid;
+        gap: 14px;
+      }
+
+      .secret-modal-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f8fafc;
+        margin: 0;
+      }
+
+      .secret-modal-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .secret-modal-input {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .secret-modal-input:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+      }
+
+      .secret-modal-cancel {
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 4px 0;
+        font-family: inherit;
+        text-align: left;
+        transition: color 0.2s;
+      }
+
+      .secret-modal-cancel:hover { color: #94a3b8; }
+
+      /* ── Customization panel ── */
+      .customize-panel {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        background: rgba(15, 23, 42, 0.97);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 20px;
+        padding: 20px;
+        width: 260px;
+        z-index: 10001;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(12px);
+        display: none;
+        animation: fadeSlideIn 0.3s ease;
+      }
+
+      .customize-panel.visible {
+        display: block;
+      }
+
+      .customize-panel h3 {
+        font-size: 0.95rem;
+        color: #f8fafc;
+        font-weight: 600;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .theme-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .theme-btn {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(30, 41, 59, 0.8);
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        text-align: center;
+      }
+
+      .theme-btn:hover,
+      .theme-btn.active {
+        border-color: #38bdf8;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .close-customize {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0;
+        line-height: 1;
+      }
+
+      .close-customize:hover { color: #e2e8f0; }
+
+      .secret-code-trigger {
+        background: none;
+        border: none;
+        color: #475569;
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 4px 6px;
+        border-radius: 6px;
+        transition: color 0.2s;
+        font-family: inherit;
+      }
+
+      .secret-code-trigger:hover { color: #94a3b8; }
+
+      /* ── UI themes ── */
+      body.theme-ocean {
+        background: radial-gradient(circle at top, #0d2137, #050f1a 65%);
+      }
+      body.theme-ocean main {
+        background: rgba(5, 15, 26, 0.85);
+        border-color: rgba(34, 211, 238, 0.2);
+      }
+      body.theme-forest {
+        background: radial-gradient(circle at top, #0f2518, #060f0a 65%);
+      }
+      body.theme-forest main {
+        background: rgba(6, 15, 10, 0.85);
+        border-color: rgba(74, 222, 128, 0.2);
+      }
+      body.theme-sunset {
+        background: radial-gradient(circle at top, #2d1515, #1a0a0a 65%);
+      }
+      body.theme-sunset main {
+        background: rgba(26, 10, 10, 0.85);
+        border-color: rgba(251, 146, 60, 0.2);
+      }
+      body.theme-minimal {
+        background: #0a0a0a;
+      }
+      body.theme-minimal main {
+        background: rgba(10, 10, 10, 0.95);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: none;
+      }
+
       .price-estimate {
         background: rgba(56, 189, 248, 0.08);
         border: 1px solid rgba(56, 189, 248, 0.25);
@@ -701,6 +927,22 @@
             ></textarea>
           </label>
           <div id="priceEstimate" class="price-estimate"></div>
+          <label>
+            <span data-i18n="support.discountCode">Discount Code (optional)</span>
+            <div class="discount-code-row">
+              <input
+                name="discountCode"
+                id="discountCodeInput"
+                data-i18n-placeholder="support.discountCodePlaceholder"
+                placeholder="Enter code (e.g. 2026Xrepairpro)"
+                autocomplete="off"
+              />
+              <button class="apply-code-btn" type="button" id="applyCodeBtn">
+                <span data-i18n="support.applyCode">Apply</span>
+              </button>
+            </div>
+            <span class="code-feedback" id="codeFeedback"></span>
+          </label>
           <div class="support-actions">
             <button class="button primary" type="submit">
               <span data-i18n="support.submit">Request Support</span>
@@ -718,8 +960,34 @@
           <span data-i18n="footer.patch">Patch 1.2.7</span>
         </div>
         <span data-i18n="footer.contact">Contact: support@xmenu.dev</span>
+        <button class="secret-code-trigger" id="secretCodeTrigger" type="button" title="Enter a secret code">🔑</button>
       </footer>
     </main>
+
+    <div class="secret-modal-overlay" id="secretCodeModal" role="dialog" aria-modal="true" aria-label="Enter secret code">
+      <div class="secret-modal-box">
+        <p class="secret-modal-title">Enter secret code</p>
+        <div class="secret-modal-row">
+          <input type="text" id="secretModalInput" class="secret-modal-input" placeholder="Secret code…" autocomplete="off" />
+          <button class="apply-code-btn" id="secretModalSubmit" type="button">Unlock</button>
+        </div>
+        <button class="secret-modal-cancel" id="secretModalClose" type="button">Cancel</button>
+      </div>
+    </div>
+
+    <div class="customize-panel" id="customizePanel" aria-label="Theme customization">
+      <h3>
+        🎨 Themes
+        <button class="close-customize" id="closeCustomize" type="button" aria-label="Close customization panel">✕</button>
+      </h3>
+      <div class="theme-grid">
+        <button class="theme-btn active" data-theme="default">Default</button>
+        <button class="theme-btn" data-theme="ocean">Ocean</button>
+        <button class="theme-btn" data-theme="forest">Forest</button>
+        <button class="theme-btn" data-theme="sunset">Sunset</button>
+        <button class="theme-btn" data-theme="minimal">Minimal</button>
+      </div>
+    </div>
 
     <script>
       // Translation data
@@ -773,6 +1041,12 @@
             issuePlaceholder: "Brief description of the problem…",
             submit: "Request Support",
             helper: "A security check is required before sending. Your email client will then open.",
+            discountCode: "Discount Code (optional)",
+            discountCodePlaceholder: "Enter code (e.g. 2026Xrepairpro)",
+            applyCode: "Apply",
+            codeApplied: "✓ Code applied: {discount}% Discount",
+            codeInvalid: "✗ Invalid code",
+            codeUnlocked: "✓ Customization panel unlocked!",
             pricePhone: "📞 Estimated cost: from 2.50 € (phone support)",
             priceStorage: "💾 Estimated cost: from 40 € (storage repair)",
             priceOther: "🔧 Estimated cost: 2 € – 100 € (general repair)"
@@ -843,6 +1117,12 @@
             submit: "Support anfragen",
             helper:
               "Eine Sicherheitsprüfung ist erforderlich. Danach öffnet sich dein E-Mail-Programm.",
+            discountCode: "Rabattcode (optional)",
+            discountCodePlaceholder: "Code eingeben (z. B. 2026Xrepairpro)",
+            applyCode: "Anwenden",
+            codeApplied: "✓ Code angewendet: {discount}% Rabatt",
+            codeInvalid: "✗ Ungültiger Code",
+            codeUnlocked: "✓ Anpassungsbereich freigeschaltet!",
             pricePhone: "📞 Geschätzte Kosten: ab 2,50 € (Telefon-Support)",
             priceStorage: "💾 Geschätzte Kosten: ab 40 € (Speicher-Reparatur)",
             priceOther: "🔧 Geschätzte Kosten: 2 € – 100 € (allgemeine Reparatur)"
@@ -1036,6 +1316,124 @@
       issueTextarea.addEventListener("input", updatePriceEstimate);
       deviceTypeSelect.addEventListener("change", updatePriceEstimate);
 
+      // ── Discount & Secret Codes ───────────────────────────────────────────
+      const DISCOUNT_CODES = {
+        "2026xrepairpro": { discount: 10 }
+      };
+
+      const SECRET_UI_CODES = {
+        "customization": { action: "theme_panel" },
+        "nightpro":      { action: "theme_panel" }
+      };
+
+      let appliedCode     = null;
+      let appliedDiscount = 0;
+
+      const discountCodeInput = document.getElementById("discountCodeInput");
+      const applyCodeBtn      = document.getElementById("applyCodeBtn");
+      const codeFeedback      = document.getElementById("codeFeedback");
+
+      function applyDiscountCode() {
+        const raw        = (discountCodeInput.value || "").trim();
+        const normalized = raw.toLowerCase();
+        const t          = translations[currentLang];
+
+        // Check secret UI codes first
+        if (SECRET_UI_CODES[normalized]) {
+          const action = SECRET_UI_CODES[normalized].action;
+          if (action === "theme_panel") {
+            document.getElementById("customizePanel").classList.add("visible");
+            codeFeedback.textContent = t.support.codeUnlocked;
+            codeFeedback.className   = "code-feedback success";
+            discountCodeInput.value  = "";
+          }
+          return;
+        }
+
+        // Check discount codes
+        if (DISCOUNT_CODES[normalized]) {
+          appliedCode     = raw;
+          appliedDiscount = DISCOUNT_CODES[normalized].discount;
+          codeFeedback.textContent = t.support.codeApplied.replace("{discount}", appliedDiscount);
+          codeFeedback.className   = "code-feedback success";
+        } else if (raw.length > 0) {
+          appliedCode     = null;
+          appliedDiscount = 0;
+          codeFeedback.textContent = t.support.codeInvalid;
+          codeFeedback.className   = "code-feedback error";
+        } else {
+          appliedCode     = null;
+          appliedDiscount = 0;
+          codeFeedback.textContent = "";
+          codeFeedback.className   = "code-feedback";
+        }
+      }
+
+      applyCodeBtn.addEventListener("click", applyDiscountCode);
+      discountCodeInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); applyDiscountCode(); }
+      });
+
+      // Secret code trigger (🔑 button in footer) – opens inline modal
+      const secretCodeTrigger = document.getElementById("secretCodeTrigger");
+      const secretModal        = document.getElementById("secretCodeModal");
+      const secretModalInput   = document.getElementById("secretModalInput");
+      const secretModalSubmit  = document.getElementById("secretModalSubmit");
+      const secretModalClose   = document.getElementById("secretModalClose");
+
+      function submitSecretModal() {
+        const normalized = (secretModalInput.value || "").trim().toLowerCase();
+        secretModal.classList.remove("visible");
+        secretModalInput.value = "";
+        if (SECRET_UI_CODES[normalized]) {
+          const action = SECRET_UI_CODES[normalized].action;
+          if (action === "theme_panel") {
+            document.getElementById("customizePanel").classList.add("visible");
+          }
+        }
+      }
+
+      secretCodeTrigger.addEventListener("click", () => {
+        secretModal.classList.add("visible");
+        secretModalInput.focus();
+      });
+      secretModalSubmit.addEventListener("click", submitSecretModal);
+      secretModalClose.addEventListener("click", () => {
+        secretModal.classList.remove("visible");
+        secretModalInput.value = "";
+      });
+      secretModalInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submitSecretModal();
+        if (e.key === "Escape") { secretModal.classList.remove("visible"); secretModalInput.value = ""; }
+      });
+
+      // Customization panel
+      const customizePanel = document.getElementById("customizePanel");
+      document.getElementById("closeCustomize").addEventListener("click", () => {
+        customizePanel.classList.remove("visible");
+      });
+
+      const ALL_THEMES = ["ocean", "forest", "sunset", "minimal"];
+
+      function applyTheme(theme) {
+        ALL_THEMES.forEach(t => document.body.classList.remove("theme-" + t));
+        if (theme !== "default") {
+          document.body.classList.add("theme-" + theme);
+        }
+        document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+        const activeBtn = document.querySelector('.theme-btn[data-theme="' + theme + '"]');
+        if (activeBtn) activeBtn.classList.add("active");
+        localStorage.setItem("xmenu-theme", theme);
+      }
+
+      document.querySelectorAll(".theme-btn").forEach(btn => {
+        btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+      });
+
+      // Restore saved theme on load
+      const savedTheme = localStorage.getItem("xmenu-theme");
+      if (savedTheme) applyTheme(savedTheme);
+
       supportToggle.addEventListener("click", async () => {
         const canAccess = await window.xmenuRequireAuth();
         if (!canAccess) return;
@@ -1062,7 +1460,11 @@
         // Persist form data for after the security check
         let dataSaved = false;
         try {
-          sessionStorage.setItem("xmenu_support_data", JSON.stringify({ deviceType, brand, model, issue, lang: currentLang }));
+          sessionStorage.setItem("xmenu_support_data", JSON.stringify({
+            deviceType, brand, model, issue, lang: currentLang,
+            discountCode: appliedCode || "",
+            discountPct:  appliedDiscount
+          }));
           dataSaved = true;
         } catch (e) { /* storage unavailable */ }
 
@@ -1098,7 +1500,7 @@
           }
           sessionStorage.removeItem("xmenu_support_data");
 
-          const { deviceType, brand, model, issue, lang } = JSON.parse(saved);
+          const { deviceType, brand, model, issue, lang, discountCode, discountPct } = JSON.parse(saved);
           const tData = translations[lang] || translations[currentLang];
 
           const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
@@ -1109,6 +1511,10 @@
             "",
             issue
           ];
+          if (discountCode) {
+            bodyLines.push("");
+            bodyLines.push(`Used code: ${discountCode} | Discount: ${discountPct}%`);
+          }
           const body = encodeURIComponent(bodyLines.join("\n"));
           window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
         } catch (e) {
