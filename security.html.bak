@@ -545,10 +545,9 @@
         <h2 id="codeModalTitle">🔑 Enter Access Code</h2>
         <p>Enter your access code to skip the security check.</p>
         <input
-          type="text"
+          type="password"
           class="code-input"
           id="codeInput"
-          placeholder="····"
           maxlength="10"
           autocomplete="off"
           inputmode="numeric"
