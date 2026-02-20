@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Security Verification - XMenu</title>
+    <title>Sicherheitsprüfung - XMenu</title>
     <link rel="stylesheet" href="assets/security/styles.css" />
   </head>
   <body>
 
     <div class="card">
-      <!-- ── Header ── -->
+      <!-- ── Kopfzeile ── -->
       <div class="card-header">
         <div class="shield-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -17,120 +17,66 @@
           </svg>
         </div>
         <div>
-          <h1>Security Check</h1>
-          <p>Verifying that you are a human — XMenu</p>
+          <h1>Sicherheitsprüfung</h1>
+          <p>Verifizierung, dass du ein Mensch bist — XMenu</p>
         </div>
       </div>
 
-      <!-- ── Body ── -->
+      <!-- ── Inhalt ── -->
       <div class="card-body">
 
-        <!-- Loading spinner -->
+        <!-- Lade-Spinner -->
         <div id="loading">
-          <div class="spinner" role="status" aria-label="Loading"></div>
-          <p id="loading-text">Initialising security challenge&hellip;</p>
+          <div class="spinner" role="status" aria-label="Laden"></div>
+          <p id="loading-text">Sicherheitsprüfung wird initialisiert&hellip;</p>
           <div id="countdown-display" style="display:none;">
             <h3 style="font-size: 2rem; margin: 20px 0; color: var(--accent);">
               <span id="countdown-number">10</span>
             </h3>
-            <p>Get ready for the security check...</p>
+            <p>Bereite dich auf die Sicherheitsprüfung vor&hellip;</p>
           </div>
         </div>
 
-        <!-- Main challenge area (hidden until loading finishes) -->
+        <!-- Fragenbereich (versteckt bis Countdown abläuft) -->
         <div id="challenges" style="display:none;">
 
-          <!-- Bypass Option -->
-          <div id="bypass-section" style="margin-bottom: 20px; text-align: center;">
-            <button class="btn btn-ghost" id="bypass-btn" type="button">
-              Skip Security Check
-            </button>
-            <div id="bypass-input-area" style="display: none; margin-top: 16px;">
-              <p style="margin-bottom: 12px; color: var(--muted);">Enter bypass code:</p>
-              <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                <input
-                  id="bypass-code-input"
-                  type="password"
-                  placeholder="Enter code"
-                  style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); max-width: 200px;"
-                  maxlength="4"
-                />
-                <button class="btn btn-primary" id="bypass-submit" type="button">Verify</button>
-              </div>
-              <div id="bypass-error" style="color: var(--error); margin-top: 8px; font-size: 13px;"></div>
-            </div>
-          </div>
-
-          <!-- Progress -->
-          <div class="progress-wrap" aria-label="Challenge progress">
+          <!-- Fortschritt -->
+          <div class="progress-wrap" aria-label="Prüfungsfortschritt">
             <div class="progress-labels">
-              <span>Progress</span>
-              <span><span class="progress-current">0</span> / 3 tasks</span>
+              <span>Fortschritt</span>
+              <span><span class="progress-current">0</span> / 10 Fragen</span>
             </div>
             <div class="progress-bar-bg">
               <div class="progress-bar-fill" style="width:0%"></div>
             </div>
           </div>
 
-          <!-- Step dots -->
-          <div class="steps" role="list" aria-label="Steps">
-            <div class="step-dot" role="listitem" aria-label="Step 1: Math">1</div>
-            <div class="step-dot" role="listitem" aria-label="Step 2: Reading">2</div>
-            <div class="step-dot" role="listitem" aria-label="Step 3: Puzzle">3</div>
-          </div>
-
-          <!-- ── Challenge 1: Math ── -->
-          <div id="challenge-math" class="challenge">
-            <div class="challenge-title">Task 1 of 3 — Math</div>
-            <div class="challenge-question math-question" aria-live="polite"></div>
-            <div class="input-row">
-              <input
-                class="challenge-input math-input"
-                type="number"
-                placeholder="Your answer"
-                autocomplete="off"
-                aria-label="Math answer"
-              />
-              <button class="btn btn-primary math-submit" type="button">Submit</button>
-            </div>
-            <div class="feedback math-feedback" aria-live="assertive"></div>
-          </div>
-
-          <!-- ── Challenge 2: Reading & Understanding ── -->
-          <div id="challenge-reading" class="challenge">
-            <div class="challenge-title">Task 2 of 3 — Reading &amp; Understanding</div>
-            <div class="passage reading-passage" aria-label="Passage to read"></div>
-            <div class="challenge-question reading-question" aria-live="polite"></div>
-            <div class="choices" role="group" aria-label="Answer choices"></div>
-          </div>
-
-          <!-- ── Challenge 3: Puzzle ── -->
-          <div id="challenge-puzzle" class="challenge">
-            <div class="challenge-title">Task 3 of 3 — Puzzle</div>
-            <div class="puzzle-desc" aria-live="polite"></div>
-            <div class="sequence-display" role="status" aria-label="Selected sequence"></div>
-            <div class="puzzle-grid" role="group" aria-label="Number tiles"></div>
-            <div class="feedback puzzle-feedback" aria-live="assertive"></div>
+          <!-- Aktuelle Frage -->
+          <div id="question-area">
+            <div class="challenge-title" id="question-label">Frage 1 von 10</div>
+            <div class="challenge-question" id="question-text" aria-live="polite"></div>
+            <div class="choices" id="question-choices" role="group" aria-label="Antwortmöglichkeiten"></div>
+            <div class="feedback" id="question-feedback" aria-live="assertive"></div>
           </div>
 
         </div><!-- /#challenges -->
 
-        <!-- ── Success screen ── -->
+        <!-- ── Erfolgsmeldung ── -->
         <div id="success-screen">
           <div class="success-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
-          <h2>Verification Complete</h2>
+          <h2>Verifizierung abgeschlossen</h2>
           <p>
-            You have passed all security checks.<br>
-            Redirecting you to <strong class="redirect-destination"></strong>&hellip;
+            Du hast alle Sicherheitsfragen bestanden.<br>
+            Du wirst zu <strong class="redirect-destination"></strong> weitergeleitet&hellip;
           </p>
           <div class="redirect-bar-bg">
             <div class="redirect-bar-fill"></div>
           </div>
-          <p class="redirect-note" aria-live="polite">Redirecting&hellip;</p>
+          <p class="redirect-note" aria-live="polite">Weiterleitung&hellip;</p>
         </div>
 
       </div><!-- /.card-body -->
