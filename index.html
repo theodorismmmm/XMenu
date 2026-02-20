@@ -232,6 +232,65 @@
         align-items: center;
       }
 
+      /* Reviews section */
+      .reviews {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .review-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .review-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 12px 32px rgba(56, 189, 248, 0.15);
+      }
+
+      .review-stars {
+        color: #facc15;
+        font-size: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .review-text {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+        font-style: italic;
+      }
+
+      .review-meta {
+        font-size: 0.82rem;
+        color: #64748b;
+      }
+
+      .review-meta strong {
+        color: #94a3b8;
+        font-weight: 600;
+      }
+
+      /* Impressum link in footer */
+      .impressum-link {
+        color: #64748b;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .impressum-link:hover {
+        color: #94a3b8;
+      }
+
       .pill {
         background: rgba(56, 189, 248, 0.15);
         color: #7dd3fc;
@@ -954,12 +1013,23 @@
         </form>
       </section>
 
+      <section class="reviews" aria-label="Kundenbewertungen">
+        <div class="review-card">
+          <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="review-text">"Der Service verlief schnell und ohne viele Komplikationen"</p>
+          <div class="review-meta">
+            <strong>Hamza</strong> &mdash; MacBook Air SSD Reparatur &mdash; 5/5
+          </div>
+        </div>
+      </section>
+
       <footer>
         <div class="footer-note">
           <span class="pill" data-i18n="footer.comingSoon">Coming Soon</span>
           <span data-i18n="footer.patch">Patch 1.2.7</span>
         </div>
         <span data-i18n="footer.contact">Contact: support@xmenu.dev</span>
+        <a class="impressum-link" href="impressum.html">Impressum</a>
         <button class="secret-code-trigger" id="secretCodeTrigger" type="button" title="Enter a secret code">🔑</button>
       </footer>
     </main>
