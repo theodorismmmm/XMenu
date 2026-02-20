@@ -410,9 +410,23 @@
         background: rgba(30, 41, 59, 0.75);
         border: 1px solid rgba(148, 163, 184, 0.2);
         border-radius: 20px;
-        padding: 32px clamp(20px, 4vw, 36px);
         display: grid;
         gap: 20px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-16px);
+        pointer-events: none;
+        padding: 0 clamp(20px, 4vw, 36px);
+        transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease, padding 0.35s ease;
+      }
+
+      .support-panel.support-panel--open {
+        max-height: 3600px; /* large enough for any realistic form content */
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        padding: 32px clamp(20px, 4vw, 36px);
       }
 
       .support-panel h2 {
@@ -487,8 +501,21 @@
         line-height: 1.5;
       }
 
-      .support-panel[hidden] {
+      .price-estimate {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        color: #7dd3fc;
+        font-weight: 500;
         display: none;
+        animation: fadeSlideIn 0.3s ease;
+      }
+
+      @keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
 
       @media (max-width: 640px) {
@@ -618,7 +645,7 @@
         </div>
       </section>
 
-      <section class="support-panel" id="supportPanel" hidden>
+      <section class="support-panel" id="supportPanel">
         <div>
           <h2 data-i18n="support.title">Tech Support Request</h2>
           <p data-i18n="support.description">
@@ -630,11 +657,18 @@
           <div class="support-grid">
             <label>
               <span data-i18n="support.deviceType">Device Type</span>
-              <select name="deviceType" required>
+              <select name="deviceType" id="deviceTypeSelect" required>
                 <option value="" disabled selected data-i18n="support.pleaseSelect">Please select</option>
-                <option value="Phone">Phone</option>
+                <option value="Phone">Phone / Smartphone</option>
                 <option value="Laptop">Laptop</option>
-                <option value="iPad">iPad</option>
+                <option value="iPad">iPad / Tablet</option>
+                <option value="Desktop">Desktop PC</option>
+                <option value="iMac">iMac</option>
+                <option value="MacBook">MacBook</option>
+                <option value="Smartwatch">Smartwatch</option>
+                <option value="Smart TV">Smart TV</option>
+                <option value="Gaming Console">Gaming Console</option>
+                <option value="Other">Other Device</option>
               </select>
             </label>
             <label>
@@ -660,11 +694,13 @@
             <span data-i18n="support.issue">Describe your problem</span>
             <textarea
               name="issue"
+              id="issueTextarea"
               data-i18n-placeholder="support.issuePlaceholder"
               placeholder="Brief description of the problem…"
               required
             ></textarea>
           </label>
+          <div id="priceEstimate" class="price-estimate"></div>
           <div class="support-actions">
             <button class="button primary" type="submit">
               <span data-i18n="support.submit">Request Support</span>
@@ -736,7 +772,10 @@
             issue: "Describe your problem",
             issuePlaceholder: "Brief description of the problem…",
             submit: "Request Support",
-            helper: "Your email program will open with the pre-filled message."
+            helper: "A security check is required before sending. Your email client will then open.",
+            pricePhone: "📞 Estimated cost: from 2.50 € (phone support)",
+            priceStorage: "💾 Estimated cost: from 40 € (storage repair)",
+            priceOther: "🔧 Estimated cost: 2 € – 100 € (general repair)"
           },
           footer: {
             comingSoon: "Coming Soon",
@@ -803,7 +842,10 @@
             issuePlaceholder: "Kurze Beschreibung des Problems…",
             submit: "Support anfragen",
             helper:
-              "Es öffnet sich dein E-Mail-Programm mit der vorausgefüllten Nachricht."
+              "Eine Sicherheitsprüfung ist erforderlich. Danach öffnet sich dein E-Mail-Programm.",
+            pricePhone: "📞 Geschätzte Kosten: ab 2,50 € (Telefon-Support)",
+            priceStorage: "💾 Geschätzte Kosten: ab 40 € (Speicher-Reparatur)",
+            priceOther: "🔧 Geschätzte Kosten: 2 € – 100 € (allgemeine Reparatur)"
           },
           footer: {
             comingSoon: "Demnächst verfügbar",
@@ -874,6 +916,9 @@
       const downloadBtn = document.getElementById("downloadBtn");
       const supportPanel = document.getElementById("supportPanel");
       const supportForm = document.getElementById("supportForm");
+      const deviceTypeSelect = document.getElementById("deviceTypeSelect");
+      const issueTextarea = document.getElementById("issueTextarea");
+      const priceEstimate = document.getElementById("priceEstimate");
 
       const loginRedirectUrl =
         "https://accounts.xmenu.dev/?returnTo=" + encodeURIComponent(window.location.href);
@@ -939,20 +984,57 @@
       });
 
       const toggleSupportPanel = () => {
-        const isHidden = supportPanel.hasAttribute("hidden");
+        const isOpen = supportPanel.classList.contains("support-panel--open");
         const t = translations[currentLang];
 
-        if (isHidden) {
-          supportPanel.removeAttribute("hidden");
+        if (!isOpen) {
+          supportPanel.classList.add("support-panel--open");
           supportToggle.querySelector("[data-i18n]").textContent = t.header.supportClose;
           setTimeout(() => {
             supportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 10);
         } else {
-          supportPanel.setAttribute("hidden", "");
+          supportPanel.classList.remove("support-panel--open");
           supportToggle.querySelector("[data-i18n]").textContent = t.header.support;
         }
       };
+
+      // ── Price Estimate ────────────────────────────────────────────────────
+      const STORAGE_KEYWORDS = ["storage", "disk", "ssd", "hdd", "speicher", "festplatte", "laufwerk", "flash", "memory"];
+      const PHONE_KEYWORDS   = ["phone", "handy", "smartphone", "mobil"];
+
+      function updatePriceEstimate() {
+        const issue      = (issueTextarea.value || "").toLowerCase();
+        const deviceType = (deviceTypeSelect.value || "").toLowerCase();
+        const t          = translations[currentLang];
+
+        const hasPhone   = PHONE_KEYWORDS.some(k => issue.includes(k)) || deviceType === "phone";
+        const hasStorage = STORAGE_KEYWORDS.some(k => issue.includes(k));
+
+        let label = "";
+        if (hasPhone) {
+          label = t.support.pricePhone;
+        } else if (hasStorage) {
+          label = t.support.priceStorage;
+        } else if (issue.trim().length > 10) {
+          label = t.support.priceOther;
+        }
+
+        if (label) {
+          priceEstimate.textContent = label;
+          priceEstimate.style.display = "block";
+          // Restart the CSS animation: first reset it, then force a synchronous
+          // reflow (reading offsetHeight flushes the style change), then re-enable.
+          priceEstimate.style.animation = "none";
+          void priceEstimate.offsetHeight; // forces browser reflow to restart animation
+          priceEstimate.style.animation = "";
+        } else {
+          priceEstimate.style.display = "none";
+        }
+      }
+
+      issueTextarea.addEventListener("input", updatePriceEstimate);
+      deviceTypeSelect.addEventListener("change", updatePriceEstimate);
 
       supportToggle.addEventListener("click", async () => {
         const canAccess = await window.xmenuRequireAuth();
@@ -970,30 +1052,70 @@
       supportForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        const t = translations[currentLang];
         const formData = new FormData(supportForm);
 
         const deviceType = String(formData.get("deviceType") || "");
-        const brand = String(formData.get("brand") || "");
-        const model = String(formData.get("model") || "");
-        const issue = String(formData.get("issue") || "");
+        const brand      = String(formData.get("brand")      || "");
+        const model      = String(formData.get("model")      || "");
+        const issue      = String(formData.get("issue")      || "");
 
-        const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
+        // Persist form data for after the security check
+        let dataSaved = false;
+        try {
+          sessionStorage.setItem("xmenu_support_data", JSON.stringify({ deviceType, brand, model, issue, lang: currentLang }));
+          dataSaved = true;
+        } catch (e) { /* storage unavailable */ }
 
-        const bodyLines = [
-          `${t.support.deviceType}: ${deviceType}`,
-          `${t.support.brand}: ${brand}`,
-          `${t.support.model}: ${model}`,
-          "",
-          issue
-        ];
-        const body = encodeURIComponent(bodyLines.join("\n"));
+        if (!dataSaved) {
+          alert("Unable to save your form data (storage unavailable). Please disable private browsing or try a different browser, then resubmit.");
+          return;
+        }
 
-        window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
+        // Redirect to security check; on return the action param triggers the mailto
+        const returnTo = window.location.origin + window.location.pathname + "?action=send_support";
+        window.location.href = "security.html?returnTo=" + encodeURIComponent(returnTo);
       });
 
       const savedLang = localStorage.getItem("xmenu-lang") || "en";
       setLanguage(savedLang);
+
+      // ── Handle pending support send (return from security check) ──────────
+      (function handlePendingSupportAction() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("action") !== "send_support") return;
+
+        // Clean action param from URL
+        params.delete("action");
+        const cleanSearch = params.toString();
+        const cleanUrl = window.location.origin + window.location.pathname + (cleanSearch ? "?" + cleanSearch : "");
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        try {
+          const saved = sessionStorage.getItem("xmenu_support_data");
+          if (!saved) {
+            alert("Your support request data could not be retrieved. Please fill out and submit the form again.");
+            return;
+          }
+          sessionStorage.removeItem("xmenu_support_data");
+
+          const { deviceType, brand, model, issue, lang } = JSON.parse(saved);
+          const tData = translations[lang] || translations[currentLang];
+
+          const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
+          const bodyLines = [
+            `${tData.support.deviceType}: ${deviceType}`,
+            `${tData.support.brand}: ${brand}`,
+            `${tData.support.model}: ${model}`,
+            "",
+            issue
+          ];
+          const body = encodeURIComponent(bodyLines.join("\n"));
+          window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
+        } catch (e) {
+          alert("Your support request data could not be retrieved. Please fill out and submit the form again.");
+        }
+      })();
+
       start();
     </script>
 
