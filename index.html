@@ -827,6 +827,184 @@
           right: 16px;
         }
       }
+
+      /* ── YouTube Ad Free modal ── */
+      .yt-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10010;
+        backdrop-filter: blur(6px);
+        padding: 20px;
+      }
+
+      .yt-modal-overlay.visible {
+        display: flex;
+      }
+
+      .yt-modal-box {
+        width: min(1100px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        animation: fadeSlideIn 0.3s ease;
+      }
+
+      .yt-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .yt-modal-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .yt-iframe-wrap {
+        position: relative;
+        width: 100%;
+        height: 68vh;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: #000;
+        transition: height 0.3s ease;
+      }
+
+      .yt-iframe-wrap.fullscreen-mode {
+        height: 82vh;
+      }
+
+      .yt-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      .yt-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 14px;
+        padding: 12px 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .yt-ctrl-btn {
+        appearance: none;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(30, 41, 59, 0.8);
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 9px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .yt-ctrl-btn:hover {
+        background: rgba(56, 189, 248, 0.12);
+        border-color: rgba(56, 189, 248, 0.5);
+        color: #7dd3fc;
+        transform: translateY(-1px);
+      }
+
+      .yt-ctrl-btn.danger:hover {
+        background: rgba(248, 113, 113, 0.12);
+        border-color: rgba(248, 113, 113, 0.5);
+        color: #fca5a5;
+      }
+
+      .yt-volume-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .yt-volume-label {
+        font-size: 0.82rem;
+        color: #94a3b8;
+        white-space: nowrap;
+      }
+
+      .yt-volume-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 90px;
+        height: 4px;
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 999px;
+        outline: none;
+        cursor: pointer;
+        accent-color: #38bdf8;
+      }
+
+      .yt-url-input {
+        flex: 1;
+        min-width: 0;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-size: 0.85rem;
+        font-family: inherit;
+        transition: border-color 0.2s;
+        outline: none;
+      }
+
+      .yt-url-input:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+      }
+
+      .yt-spacer {
+        flex: 1;
+        min-width: 8px;
+      }
+
+      .button.yt-free {
+        background: linear-gradient(135deg, #ff0000, #cc0000);
+        color: #fff;
+        box-shadow: 0 10px 28px rgba(204, 0, 0, 0.35);
+      }
+
+      .button.yt-free:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(204, 0, 0, 0.45);
+      }
+
+      @media (max-width: 640px) {
+        .yt-iframe-wrap {
+          height: 45vh;
+        }
+        .yt-iframe-wrap.fullscreen-mode {
+          height: 60vh;
+        }
+        .yt-volume-slider {
+          width: 60px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -904,6 +1082,10 @@
           <a class="button secondary" id="releasesBtn" href="https://rls.xmenu.dev" aria-label="Releases">
             Releases
           </a>
+
+          <button class="button yt-free" id="ytAdFreeBtn" type="button" aria-label="YouTube Ad Free">
+            ▶ YouTube Ad Free
+          </button>
         </div>
 
         <p id="signedInLabel" style="display: none; margin-top: 10px; color: #cbd5e1;"></p>
@@ -1594,6 +1776,138 @@
       })();
 
       start();
+    </script>
+
+    <div class="yt-modal-overlay" id="ytModal" role="dialog" aria-modal="true" aria-label="YouTube Ad Free">
+      <div class="yt-modal-box">
+        <div class="yt-modal-header">
+          <span class="yt-modal-title">▶ YouTube Ad Free &mdash; powered by skipcut.com</span>
+          <button class="yt-ctrl-btn danger" id="ytModalClose" type="button" aria-label="Close">✕ Close</button>
+        </div>
+        <div class="yt-iframe-wrap" id="ytIframeWrap">
+          <iframe
+            id="ytIframe"
+            class="yt-iframe"
+            src="https://skipcut.com"
+            title="YouTube Ad Free – skipcut.com"
+            allowfullscreen
+            allow="autoplay; fullscreen; picture-in-picture"
+            sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+          ></iframe>
+        </div>
+        <div class="yt-controls">
+          <!-- Volume -->
+          <div class="yt-volume-row">
+            <span class="yt-volume-label">🔊</span>
+            <input type="range" class="yt-volume-slider" id="ytVolume" min="0" max="100" value="100" aria-label="Volume" />
+            <span class="yt-volume-label" id="ytVolumeVal">100%</span>
+          </div>
+
+          <!-- Size toggle -->
+          <button class="yt-ctrl-btn" id="ytSizeBtn" type="button" aria-label="Toggle size">⤢ Expand</button>
+
+          <!-- Go back -->
+          <button class="yt-ctrl-btn" id="ytBackBtn" type="button" aria-label="Go back">← Back</button>
+
+          <!-- Refresh -->
+          <button class="yt-ctrl-btn" id="ytRefreshBtn" type="button" aria-label="Refresh">↺ Refresh</button>
+
+          <!-- Open another URL -->
+          <div class="yt-spacer"></div>
+          <input type="url" class="yt-url-input" id="ytUrlInput" placeholder="Open another URL… (e.g. https://skipcut.com/…)" aria-label="Open URL in player" />
+          <button class="yt-ctrl-btn" id="ytGoBtn" type="button" aria-label="Go to URL">Go →</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ── YouTube Ad Free modal ───────────────────────────────────────────────
+      (function () {
+        const overlay    = document.getElementById("ytModal");
+        const openBtn    = document.getElementById("ytAdFreeBtn");
+        const closeBtn   = document.getElementById("ytModalClose");
+        const iframe     = document.getElementById("ytIframe");
+        const wrap       = document.getElementById("ytIframeWrap");
+        const sizeBtn    = document.getElementById("ytSizeBtn");
+        const backBtn    = document.getElementById("ytBackBtn");
+        const refreshBtn = document.getElementById("ytRefreshBtn");
+        const urlInput   = document.getElementById("ytUrlInput");
+        const goBtn      = document.getElementById("ytGoBtn");
+        const volSlider  = document.getElementById("ytVolume");
+        const volLabel   = document.getElementById("ytVolumeVal");
+
+        let expanded = false;
+
+        function openModal() {
+          overlay.classList.add("visible");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          overlay.classList.remove("visible");
+          document.body.style.overflow = "";
+        }
+
+        openBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closeModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("visible")) closeModal();
+        });
+
+        // Size toggle
+        sizeBtn.addEventListener("click", () => {
+          expanded = !expanded;
+          wrap.classList.toggle("fullscreen-mode", expanded);
+          sizeBtn.textContent = expanded ? "⤡ Shrink" : "⤢ Expand";
+        });
+
+        // Track the current iframe origin for targeted postMessage
+        let currentIframeOrigin = "https://skipcut.com";
+
+        // Go back – reload to initial URL (iframes from cross-origins block history navigation)
+        backBtn.addEventListener("click", () => {
+          iframe.src = "https://skipcut.com";
+          currentIframeOrigin = "https://skipcut.com";
+          urlInput.value = "";
+        });
+
+        // Refresh
+        refreshBtn.addEventListener("click", () => {
+          iframe.src = iframe.src.split("?")[0] + "?refresh=" + Date.now();
+        });
+
+        // Open another URL – only http/https allowed to prevent javascript: or data: URIs
+        function navigateTo(url) {
+          const trimmed = url.trim();
+          if (!trimmed) return;
+          const full = /^https?:\/\//i.test(trimmed) ? trimmed : "https://" + trimmed;
+          if (!/^https?:\/\//i.test(full)) return;
+          try { currentIframeOrigin = new URL(full).origin; } catch (_) {}
+          iframe.src = full;
+        }
+
+        goBtn.addEventListener("click", () => navigateTo(urlInput.value));
+        urlInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") navigateTo(urlInput.value);
+        });
+
+        // Volume – attempts to send volume to any playing video inside the iframe via postMessage.
+        // Cross-origin restrictions mean this only works if the loaded page listens for the message.
+        volSlider.addEventListener("input", () => {
+          const val = parseInt(volSlider.value, 10);
+          volLabel.textContent = val + "%";
+          try {
+            iframe.contentWindow.postMessage({ type: "setVolume", volume: val / 100 }, currentIframeOrigin);
+          } catch (err) {
+            console.debug("Volume postMessage failed (cross-origin restriction):", err);
+          }
+        });
+      })();
     </script>
 
     <script type="module">
