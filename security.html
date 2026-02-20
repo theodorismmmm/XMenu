@@ -4,870 +4,138 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Security Verification - XMenu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        color-scheme: dark;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        background-color: #0f172a;
-        color: #e2e8f0;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
-        padding: 48px 20px;
-      }
-
-      /* ── Pre-check overlay ───────────────────────────────────────────────── */
-      .precheck-overlay {
-        position: fixed;
-        inset: 0;
-        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 200;
-        transition: opacity 0.5s ease, transform 0.5s ease;
-      }
-
-      .precheck-overlay.fade-out {
-        opacity: 0;
-        transform: scale(0.97);
-        pointer-events: none;
-      }
-
-      .precheck-card {
-        text-align: center;
-        padding: 48px clamp(24px, 6vw, 64px);
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 28px;
-        width: min(480px, 90%);
-        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.55);
-        backdrop-filter: blur(12px);
-        animation: slideUpIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-      }
-
-      @keyframes slideUpIn {
-        from { opacity: 0; transform: translateY(32px) scale(0.97); }
-        to   { opacity: 1; transform: translateY(0)   scale(1);    }
-      }
-
-      .precheck-icon {
-        font-size: 3.2rem;
-        line-height: 1;
-        margin-bottom: 20px;
-        display: block;
-        animation: iconPulse 2.4s ease-in-out infinite;
-      }
-
-      @keyframes iconPulse {
-        0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0px #3b82f6); }
-        50%       { transform: scale(1.12); filter: drop-shadow(0 0 12px #3b82f6); }
-      }
-
-      .precheck-title {
-        font-size: clamp(1.5rem, 4vw, 2rem);
-        font-weight: 700;
-        color: #f8fafc;
-        margin-bottom: 10px;
-        letter-spacing: -0.02em;
-      }
-
-      .precheck-sub {
-        font-size: 0.95rem;
-        color: #94a3b8;
-        line-height: 1.6;
-        margin-bottom: 28px;
-      }
-
-      /* SVG countdown ring */
-      .countdown-wrap {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 28px;
-        position: relative;
-        width: 80px;
-        height: 80px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .countdown-svg {
-        transform: rotate(-90deg);
-      }
-
-      .countdown-track {
-        fill: none;
-        stroke: rgba(148, 163, 184, 0.15);
-        stroke-width: 5;
-      }
-
-      .countdown-progress {
-        fill: none;
-        stroke: #3b82f6;
-        stroke-width: 5;
-        stroke-linecap: round;
-        stroke-dasharray: 220;
-        stroke-dashoffset: 0;
-        transition: stroke-dashoffset 1s linear;
-        filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
-      }
-
-      .countdown-number {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #f8fafc;
-      }
-
-      /* Skip button */
-      .skip-btn {
-        padding: 11px 26px;
-        background: rgba(148, 163, 184, 0.08);
-        color: #94a3b8;
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 999px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease,
-                    box-shadow 0.2s ease;
-      }
-
-      .skip-btn:hover {
-        background: rgba(148, 163, 184, 0.16);
-        color: #cbd5e1;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      }
-
-      .skip-btn:active {
-        transform: translateY(0);
-      }
-
-      /* ── Code-bypass modal ───────────────────────────────────────────────── */
-      .code-modal-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.65);
-        backdrop-filter: blur(6px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 300;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-      }
-
-      .code-modal-backdrop.show {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      .code-modal {
-        background: rgba(15, 23, 42, 0.96);
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        border-radius: 20px;
-        padding: 40px clamp(24px, 5vw, 48px);
-        width: min(400px, 90%);
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-        text-align: center;
-        transform: translateY(20px) scale(0.97);
-        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .code-modal-backdrop.show .code-modal {
-        transform: translateY(0) scale(1);
-      }
-
-      .code-modal h2 {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #f8fafc;
-        margin-bottom: 10px;
-      }
-
-      .code-modal p {
-        font-size: 0.9rem;
-        color: #94a3b8;
-        margin-bottom: 20px;
-        line-height: 1.5;
-      }
-
-      .code-input {
-        width: 100%;
-        padding: 12px 16px;
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 10px;
-        color: #e2e8f0;
-        font-size: 1.2rem;
-        font-family: inherit;
-        font-weight: 600;
-        letter-spacing: 0.2em;
-        text-align: center;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        margin-bottom: 12px;
-      }
-
-      .code-input:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-      }
-
-      .code-error {
-        font-size: 0.85rem;
-        color: #fca5a5;
-        margin-bottom: 16px;
-        min-height: 20px;
-        transition: opacity 0.2s ease;
-      }
-
-      .code-submit-btn {
-        width: 100%;
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-        border: none;
-        border-radius: 999px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.2s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        margin-bottom: 10px;
-      }
-
-      .code-submit-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.45);
-      }
-
-      .code-submit-btn:active {
-        transform: translateY(0);
-      }
-
-      .code-cancel-btn {
-        background: none;
-        border: none;
-        color: #64748b;
-        font-size: 0.85rem;
-        font-family: inherit;
-        cursor: pointer;
-        padding: 4px 8px;
-        transition: color 0.2s ease;
-      }
-
-      .code-cancel-btn:hover {
-        color: #94a3b8;
-      }
-
-      /* ── Main security form ───────────────────────────────────────────────── */
-      .container {
-        width: min(600px, 100%);
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 28px;
-        padding: 56px clamp(24px, 5vw, 64px);
-        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.45);
-        backdrop-filter: blur(10px);
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .container.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      h1 {
-        margin: 0 0 16px;
-        font-size: clamp(1.8rem, 4vw, 2.4rem);
-        color: #f8fafc;
-        font-weight: 700;
-        line-height: 1.2;
-      }
-
-      .subtitle {
-        margin: 0 0 32px;
-        font-size: 1rem;
-        color: #cbd5e1;
-        line-height: 1.6;
-      }
-
-      .question {
-        margin-bottom: 24px;
-        padding: 20px;
-        background: rgba(30, 41, 59, 0.5);
-        border-radius: 12px;
-        border: 1px solid rgba(148, 163, 184, 0.15);
-        transition: border-color 0.2s ease, background 0.2s ease;
-      }
-
-      .question:focus-within {
-        border-color: rgba(59, 130, 246, 0.35);
-        background: rgba(30, 41, 59, 0.7);
-      }
-
-      .question-label {
-        display: block;
-        margin-bottom: 12px;
-        font-size: 0.95rem;
-        color: #f8fafc;
-        font-weight: 600;
-      }
-
-      .question-input {
-        width: 100%;
-        padding: 12px 16px;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 8px;
-        color: #e2e8f0;
-        font-size: 0.95rem;
-        font-family: inherit;
-        transition: all 0.2s ease;
-      }
-
-      .question-input:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      }
-
-      .question-input::placeholder {
-        color: #64748b;
-      }
-
-      .submit-btn {
-        width: 100%;
-        padding: 14px 28px;
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-        border: none;
-        border-radius: 999px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-      }
-
-      .submit-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-      }
-
-      .submit-btn:active {
-        transform: translateY(0);
-      }
-
-      .error-message {
-        margin-top: 16px;
-        padding: 12px 16px;
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 8px;
-        color: #fca5a5;
-        font-size: 0.9rem;
-        display: none;
-        animation: fadeIn 0.3s ease;
-      }
-
-      .error-message.show {
-        display: block;
-      }
-
-      .info-box {
-        margin-bottom: 24px;
-        padding: 16px;
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        border-radius: 12px;
-        color: #93c5fd;
-        font-size: 0.9rem;
-        line-height: 1.6;
-      }
-
-      .loader {
-        display: none;
-        text-align: center;
-        margin-top: 16px;
-      }
-
-      .loader.show {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-      }
-
-      .spinner {
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(148, 163, 184, 0.2);
-        border-top-color: #3b82f6;
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-        flex-shrink: 0;
-      }
-
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-
-      .loader-text {
-        color: #94a3b8;
-        font-size: 0.9rem;
-      }
-
-      .attempts-warning {
-        margin-top: 16px;
-        padding: 12px 16px;
-        background: rgba(251, 191, 36, 0.1);
-        border: 1px solid rgba(251, 191, 36, 0.3);
-        border-radius: 8px;
-        color: #fcd34d;
-        font-size: 0.9rem;
-        display: none;
-      }
-
-      .attempts-warning.show {
-        display: block;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-4px); }
-        to   { opacity: 1; transform: translateY(0);    }
-      }
-
-      /* ── Access-granted flash ─────────────────────────────────────────────── */
-      .granted-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(16, 185, 129, 0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 400;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.4s ease;
-      }
-
-      .granted-overlay.show {
-        opacity: 1;
-      }
-
-      .granted-card {
-        text-align: center;
-        background: rgba(15, 23, 42, 0.97);
-        border: 1px solid rgba(16, 185, 129, 0.4);
-        border-radius: 20px;
-        padding: 40px 48px;
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5),
-                    0 0 40px rgba(16, 185, 129, 0.15);
-        animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-      }
-
-      @keyframes popIn {
-        from { transform: scale(0.85); opacity: 0; }
-        to   { transform: scale(1);    opacity: 1; }
-      }
-
-      .granted-icon {
-        font-size: 3rem;
-        display: block;
-        margin-bottom: 12px;
-      }
-
-      .granted-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #10b981;
-      }
-    </style>
+    <link rel="stylesheet" href="assets/security/styles.css" />
   </head>
   <body>
-    <!-- ── Pre-check 3-second announcement overlay ─────────────────────── -->
-    <div class="precheck-overlay" id="precheckOverlay">
-      <div class="precheck-card">
-        <span class="precheck-icon">🔒</span>
-        <h2 class="precheck-title">Quick Security Check</h2>
-        <p class="precheck-sub">We'll verify you're human in just a moment.</p>
 
-        <div class="countdown-wrap">
-          <svg class="countdown-svg" width="80" height="80" viewBox="0 0 80 80">
-            <circle class="countdown-track" cx="40" cy="40" r="35"/>
-            <circle class="countdown-progress" id="countdownRing" cx="40" cy="40" r="35"/>
+    <div class="card">
+      <!-- ── Header ── -->
+      <div class="card-header">
+        <div class="shield-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7L12 2z"/>
           </svg>
-          <div class="countdown-number" id="countdownNum">10</div>
         </div>
-
-        <button type="button" class="skip-btn" id="skipBtn">
-          Skip security check
-        </button>
-      </div>
-    </div>
-
-    <!-- ── Bypass-code modal ───────────────────────────────────────────── -->
-    <div class="code-modal-backdrop" id="codeModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="codeModalTitle">
-      <div class="code-modal">
-        <h2 id="codeModalTitle">🔑 Enter Access Code</h2>
-        <p>Enter your access code to skip the security check.</p>
-        <input
-          type="text"
-          class="code-input"
-          id="codeInput"
-          placeholder="····"
-          maxlength="10"
-          autocomplete="off"
-          inputmode="numeric"
-        />
-        <div class="code-error" id="codeError"></div>
-        <button type="button" class="code-submit-btn" id="codeSubmitBtn">Verify Code</button>
-        <br/>
-        <button type="button" class="code-cancel-btn" id="codeCancelBtn">Cancel</button>
-      </div>
-    </div>
-
-    <!-- ── Access-granted flash ────────────────────────────────────────── -->
-    <div class="granted-overlay" id="grantedOverlay">
-      <div class="granted-card">
-        <span class="granted-icon">✅</span>
-        <div class="granted-title">Access Granted!</div>
-      </div>
-    </div>
-
-    <div class="container" id="mainContainer">
-      <h1>🛡️ Security Verification</h1>
-      <p class="subtitle">
-        Please answer the following questions to verify you're human and gain access to XMenu.
-      </p>
-
-      <div class="info-box">
-        <strong>Why am I seeing this?</strong><br />
-        This security check helps protect XMenu from automated bots and ensures a safe experience for all users.
+        <div>
+          <h1>Security Check</h1>
+          <p>Verifying that you are a human — XMenu</p>
+        </div>
       </div>
 
-      <form id="securityForm">
-        <div class="question">
-          <label class="question-label" for="q1">
-            What is the result of 7 + 5?
-          </label>
-          <input
-            type="text"
-            id="q1"
-            name="q1"
-            class="question-input"
-            placeholder="Enter your answer"
-            required
-          />
+      <!-- ── Body ── -->
+      <div class="card-body">
+
+        <!-- Loading spinner -->
+        <div id="loading">
+          <div class="spinner" role="status" aria-label="Loading"></div>
+          <p id="loading-text">Initialising security challenge&hellip;</p>
+          <div id="countdown-display" style="display:none;">
+            <h3 style="font-size: 2rem; margin: 20px 0; color: var(--accent);">
+              <span id="countdown-number">10</span>
+            </h3>
+            <p>Get ready for the security check...</p>
+          </div>
         </div>
 
-        <div class="question">
-          <label class="question-label" for="q2">
-            What color is the sky on a clear day?
-          </label>
-          <input
-            type="text"
-            id="q2"
-            name="q2"
-            class="question-input"
-            placeholder="Enter your answer"
-            required
-          />
+        <!-- Main challenge area (hidden until loading finishes) -->
+        <div id="challenges" style="display:none;">
+
+          <!-- Bypass Option -->
+          <div id="bypass-section" style="margin-bottom: 20px; text-align: center;">
+            <button class="btn btn-ghost" id="bypass-btn" type="button">
+              Skip Security Check
+            </button>
+            <div id="bypass-input-area" style="display: none; margin-top: 16px;">
+              <p style="margin-bottom: 12px; color: var(--muted);">Enter bypass code:</p>
+              <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                <input
+                  id="bypass-code-input"
+                  type="password"
+                  placeholder="Enter code"
+                  style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); max-width: 200px;"
+                  maxlength="4"
+                />
+                <button class="btn btn-primary" id="bypass-submit" type="button">Verify</button>
+              </div>
+              <div id="bypass-error" style="color: var(--error); margin-top: 8px; font-size: 13px;"></div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-wrap" aria-label="Challenge progress">
+            <div class="progress-labels">
+              <span>Progress</span>
+              <span><span class="progress-current">0</span> / 3 tasks</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- Step dots -->
+          <div class="steps" role="list" aria-label="Steps">
+            <div class="step-dot" role="listitem" aria-label="Step 1: Math">1</div>
+            <div class="step-dot" role="listitem" aria-label="Step 2: Reading">2</div>
+            <div class="step-dot" role="listitem" aria-label="Step 3: Puzzle">3</div>
+          </div>
+
+          <!-- ── Challenge 1: Math ── -->
+          <div id="challenge-math" class="challenge">
+            <div class="challenge-title">Task 1 of 3 — Math</div>
+            <div class="challenge-question math-question" aria-live="polite"></div>
+            <div class="input-row">
+              <input
+                class="challenge-input math-input"
+                type="number"
+                placeholder="Your answer"
+                autocomplete="off"
+                aria-label="Math answer"
+              />
+              <button class="btn btn-primary math-submit" type="button">Submit</button>
+            </div>
+            <div class="feedback math-feedback" aria-live="assertive"></div>
+          </div>
+
+          <!-- ── Challenge 2: Reading & Understanding ── -->
+          <div id="challenge-reading" class="challenge">
+            <div class="challenge-title">Task 2 of 3 — Reading &amp; Understanding</div>
+            <div class="passage reading-passage" aria-label="Passage to read"></div>
+            <div class="challenge-question reading-question" aria-live="polite"></div>
+            <div class="choices" role="group" aria-label="Answer choices"></div>
+          </div>
+
+          <!-- ── Challenge 3: Puzzle ── -->
+          <div id="challenge-puzzle" class="challenge">
+            <div class="challenge-title">Task 3 of 3 — Puzzle</div>
+            <div class="puzzle-desc" aria-live="polite"></div>
+            <div class="sequence-display" role="status" aria-label="Selected sequence"></div>
+            <div class="puzzle-grid" role="group" aria-label="Number tiles"></div>
+            <div class="feedback puzzle-feedback" aria-live="assertive"></div>
+          </div>
+
+        </div><!-- /#challenges -->
+
+        <!-- ── Success screen ── -->
+        <div id="success-screen">
+          <div class="success-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h2>Verification Complete</h2>
+          <p>
+            You have passed all security checks.<br>
+            Redirecting you to <strong class="redirect-destination"></strong>&hellip;
+          </p>
+          <div class="redirect-bar-bg">
+            <div class="redirect-bar-fill"></div>
+          </div>
+          <p class="redirect-note" aria-live="polite">Redirecting&hellip;</p>
         </div>
 
-        <div class="question">
-          <label class="question-label" for="q3">
-            Complete the sequence: 2, 4, 6, 8, __
-          </label>
-          <input
-            type="text"
-            id="q3"
-            name="q3"
-            class="question-input"
-            placeholder="Enter the next number"
-            required
-          />
-        </div>
+      </div><!-- /.card-body -->
+    </div><!-- /.card -->
 
-        <button type="submit" class="submit-btn">Verify & Continue</button>
-
-        <div class="error-message" id="errorMessage"></div>
-        <div class="attempts-warning" id="attemptsWarning"></div>
-        <div class="loader" id="loader">
-          <div class="spinner"></div>
-          <div class="loader-text">Verifying your answers…</div>
-        </div>
-      </form>
-    </div>
-
-    <script>
-      // ── DOM refs ─────────────────────────────────────────────────────────────
-      const precheckOverlay   = document.getElementById("precheckOverlay");
-      const countdownRing     = document.getElementById("countdownRing");
-      const countdownNum      = document.getElementById("countdownNum");
-      const skipBtn           = document.getElementById("skipBtn");
-      const codeModalBackdrop = document.getElementById("codeModalBackdrop");
-      const codeInput         = document.getElementById("codeInput");
-      const codeError         = document.getElementById("codeError");
-      const codeSubmitBtn     = document.getElementById("codeSubmitBtn");
-      const codeCancelBtn     = document.getElementById("codeCancelBtn");
-      const grantedOverlay    = document.getElementById("grantedOverlay");
-      const mainContainer     = document.getElementById("mainContainer");
-      const securityForm      = document.getElementById("securityForm");
-      const errorMessage      = document.getElementById("errorMessage");
-      const attemptsWarning   = document.getElementById("attemptsWarning");
-      const loader            = document.getElementById("loader");
-
-      // ── Helpers ──────────────────────────────────────────────────────────────
-      // NOTE: The bypass code is intentionally client-side; this repo has no backend.
-      // It provides a convenience shortcut, not a strong security guarantee.
-      const BYPASS_CODE   = "9182";
-      const RING_CIRCUMF  = 2 * Math.PI * 35; // ≈ 219.9
-
-      // Get returnTo from URL early so we can use it in grantAccess()
-      const urlParams = new URLSearchParams(window.location.search);
-      const returnTo  = urlParams.get("returnTo") || "https://xmenu.dev/";
-
-      function grantAccess() {
-        // Store verified status in sessionStorage
-        const verificationToken = generateToken();
-        const expirationTime    = Date.now() + 24 * 60 * 60 * 1000;
-        sessionStorage.setItem("xmenu_verified",             "true");
-        sessionStorage.setItem("xmenu_verification_token",   verificationToken);
-        sessionStorage.setItem("xmenu_verification_expiry",  expirationTime.toString());
-        sessionStorage.removeItem("xmenu_security_attempts");
-        sessionStorage.removeItem("xmenu_security_lockout");
-
-        // Show access-granted animation then redirect
-        grantedOverlay.classList.add("show");
-        const separator = returnTo.includes("?") ? "&" : "?";
-        setTimeout(() => {
-          window.location.href = returnTo + separator + "verified=true";
-        }, 900);
-      }
-
-      function generateToken() {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let token = "";
-        for (let i = 0; i < 32; i++) {
-          token += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return token;
-      }
-
-      function dismissPrecheck() {
-        precheckOverlay.classList.add("fade-out");
-        setTimeout(() => {
-          precheckOverlay.style.display = "none";
-          mainContainer.classList.add("visible");
-        }, 500);
-      }
-
-      // ── Pre-check countdown (10 seconds) ─────────────────────────────────────
-      // If user is already verified via sessionStorage, skip the pre-check
-      (function redirectIfAlreadyVerified() {
-        const isVerified      = sessionStorage.getItem("xmenu_verified") === "true";
-        const verificationExp = parseInt(sessionStorage.getItem("xmenu_verification_expiry") || "0");
-        if (isVerified && Date.now() < verificationExp) {
-          // Already verified – redirect immediately without showing anything
-          const separator = returnTo.includes("?") ? "&" : "?";
-          window.location.href = returnTo + separator + "verified=true";
-        }
-      })();
-
-      let countdownValue   = 10;
-      let activeInterval   = null;  // single shared reference prevents duplicate intervals
-
-      // Initialize ring to full circle
-      countdownRing.style.strokeDashoffset = "0";
-
-      function startCountdown() {
-        if (activeInterval) clearInterval(activeInterval); // cancel any existing interval
-        activeInterval = setInterval(() => {
-          countdownValue--;
-          countdownNum.textContent = countdownValue;
-
-          // Shrink the ring: offset goes from 0 → RING_CIRCUMF over 10 steps
-          const offset = ((10 - countdownValue) / 10) * RING_CIRCUMF;
-          countdownRing.style.strokeDashoffset = offset.toString();
-
-          if (countdownValue <= 0) {
-            clearInterval(activeInterval);
-            activeInterval = null;
-            dismissPrecheck();
-          }
-        }, 1000);
-      }
-
-      startCountdown();
-
-      // ── Skip button ───────────────────────────────────────────────────────────
-      skipBtn.addEventListener("click", () => {
-        if (activeInterval) { clearInterval(activeInterval); activeInterval = null; }
-        codeError.textContent = "";
-        codeInput.value = "";
-        codeModalBackdrop.classList.add("show");
-        setTimeout(() => codeInput.focus(), 50);
-      });
-
-      // ── Code modal ────────────────────────────────────────────────────────────
-      function submitCode() {
-        const entered = codeInput.value.trim();
-        if (entered === BYPASS_CODE) {
-          codeModalBackdrop.classList.remove("show");
-          precheckOverlay.style.display = "none";
-          grantAccess();
-        } else {
-          codeError.textContent = "Incorrect code. Please try again.";
-          codeInput.value = "";
-          codeInput.focus();
-        }
-      }
-
-      codeSubmitBtn.addEventListener("click", submitCode);
-
-      codeInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submitCode();
-      });
-
-      codeCancelBtn.addEventListener("click", () => {
-        codeModalBackdrop.classList.remove("show");
-        // Resume countdown if time remains; otherwise dismiss immediately
-        if (countdownValue > 0) {
-          startCountdown();
-        } else {
-          dismissPrecheck();
-        }
-      });
-
-      // Close modal on backdrop click
-      codeModalBackdrop.addEventListener("click", (e) => {
-        if (e.target === codeModalBackdrop) codeCancelBtn.click();
-      });
-
-      // ── Security-form logic ───────────────────────────────────────────────────
-      // Define correct answers (case-insensitive; multiple languages supported)
-      const correctAnswers = {
-        q1: ["12", "twelve"],
-        q2: ["blue", "blau"], // English and German accepted
-        q3: ["10", "ten"]
-      };
-
-      // Track attempts
-      const MAX_ATTEMPTS = 3;
-      let attempts = parseInt(sessionStorage.getItem("xmenu_security_attempts") || "0");
-
-      // Check if user has too many failed attempts
-      if (attempts >= MAX_ATTEMPTS) {
-        const lockoutTime    = parseInt(sessionStorage.getItem("xmenu_security_lockout") || "0");
-        const now            = Date.now();
-        const lockoutDuration = 5 * 60 * 1000;
-
-        if (now < lockoutTime) {
-          const remainingTime = Math.ceil((lockoutTime - now) / 1000 / 60);
-          errorMessage.textContent = `Too many failed attempts. Please try again in ${remainingTime} minute(s).`;
-          errorMessage.classList.add("show");
-          securityForm.querySelector(".submit-btn").disabled = true;
-          securityForm.querySelector(".submit-btn").style.opacity = "0.5";
-          securityForm.querySelector(".submit-btn").style.cursor = "not-allowed";
-        } else {
-          attempts = 0;
-          sessionStorage.setItem("xmenu_security_attempts", "0");
-          sessionStorage.removeItem("xmenu_security_lockout");
-        }
-      }
-
-      if (attempts > 0 && attempts < MAX_ATTEMPTS) {
-        attemptsWarning.textContent = `⚠️ Warning: ${attempts} of ${MAX_ATTEMPTS} attempts used. ${MAX_ATTEMPTS - attempts} remaining.`;
-        attemptsWarning.classList.add("show");
-      }
-
-      securityForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        if (attempts >= MAX_ATTEMPTS) {
-          const lockoutTime = parseInt(sessionStorage.getItem("xmenu_security_lockout") || "0");
-          if (Date.now() < lockoutTime) return;
-        }
-
-        loader.classList.add("show");
-        errorMessage.classList.remove("show");
-        attemptsWarning.classList.remove("show");
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const formData = new FormData(securityForm);
-        const answers  = {
-          q1: formData.get("q1").trim().toLowerCase(),
-          q2: formData.get("q2").trim().toLowerCase(),
-          q3: formData.get("q3").trim().toLowerCase()
-        };
-
-        let allCorrect = true;
-        for (const [key, value] of Object.entries(answers)) {
-          if (!correctAnswers[key].includes(value)) {
-            allCorrect = false;
-            break;
-          }
-        }
-
-        loader.classList.remove("show");
-
-        if (allCorrect) {
-          grantAccess();
-        } else {
-          attempts++;
-          sessionStorage.setItem("xmenu_security_attempts", attempts.toString());
-
-          if (attempts >= MAX_ATTEMPTS) {
-            const lockoutTime = Date.now() + 5 * 60 * 1000;
-            sessionStorage.setItem("xmenu_security_lockout", lockoutTime.toString());
-            errorMessage.textContent = "Too many failed attempts. You've been locked out for 5 minutes.";
-            securityForm.querySelector(".submit-btn").disabled = true;
-            securityForm.querySelector(".submit-btn").style.opacity = "0.5";
-            securityForm.querySelector(".submit-btn").style.cursor = "not-allowed";
-          } else {
-            errorMessage.textContent = `Incorrect answer(s). Please try again. (${attempts}/${MAX_ATTEMPTS} attempts used)`;
-            attemptsWarning.textContent = `⚠️ Warning: ${attempts} of ${MAX_ATTEMPTS} attempts used. ${MAX_ATTEMPTS - attempts} remaining.`;
-            attemptsWarning.classList.add("show");
-          }
-
-          errorMessage.classList.add("show");
-        }
-      });
-    </script>
+    <script src="assets/security/script.js"></script>
   </body>
 </html>
