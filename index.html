@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XMenu - Your iPad Experience</title>
     <script>
-      // Redirect to external security verification
+      // Redirect to local security verification
       (function() {
         // Helper function to safely get cookie value
         function getCookie(name) {
@@ -28,7 +28,7 @@
         }
 
         function storeVerification() {
-          const expiryMs = Date.now() + 60 * 60 * 1000; // 1 hour
+          const expiryMs = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
           // Cookie (works when served over HTTPS)
           const expires = new Date(expiryMs).toUTCString();
           document.cookie = "xmenu_security_verified=true; expires=" + expires + "; path=/; SameSite=Lax";
@@ -46,12 +46,11 @@
                           isLocalStorageVerified();
         
         if (!isVerified) {
-          // Not verified, redirect to security service
-          // Note: The external service must validate returnTo against an allowlist
+          // Not verified – redirect to local security check
           const currentUrl = encodeURIComponent(window.location.href);
-          window.location.replace("https://security.xmenu.dev?returnTo=" + currentUrl);
+          window.location.replace("security.html?returnTo=" + currentUrl);
         } else if (urlParams.get('verified')) {
-          // User just came back from security.xmenu.dev – persist verification so the
+          // User just passed the security check – persist verification so the
           // site stays unlocked for this user without requiring re-verification.
           storeVerification();
 
@@ -824,7 +823,7 @@
         }
       };
 
-      let currentLang = "en";
+      let currentLang = localStorage.getItem("xmenu-lang") || "de";
       let currentAssets = translations[currentLang].assets;
 
       function setLanguage(lang) {
