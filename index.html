@@ -1157,6 +1157,37 @@
       }
       .xp-toast.visible { opacity: 1; transform: translateY(0); }
 
+      /* ── Watch Ad for XP button ── */
+      .watch-ad-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+      .watch-ad-btn {
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        color: #fff;
+        border: none;
+        box-shadow: 0 10px 28px rgba(124, 58, 237, 0.35);
+        font-size: 0.92rem;
+      }
+      .watch-ad-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(124, 58, 237, 0.5);
+      }
+      .watch-ad-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .watch-ad-count {
+        font-size: 0.82rem;
+        color: #94a3b8;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
       /* ── Rewarded Ad Overlay ── */
       .ad-overlay {
         position: fixed;
@@ -1494,6 +1525,12 @@
             <span class="member-perk-label">Your discount code:</span>
             <span class="member-perk-code" id="memberPerkCode">—</span>
             <button class="copy-code-btn" id="copyMemberCodeBtn" type="button">📋 Copy</button>
+          </div>
+
+          <!-- Watch Ad for XP -->
+          <div class="watch-ad-row">
+            <button class="button watch-ad-btn" id="watchAdBtn" type="button" disabled>🎬 Watch Ad for XP (+10 XP)</button>
+            <span class="watch-ad-count" id="watchAdCount">5 / 5 left today</span>
           </div>
         </div>
 
@@ -2518,9 +2555,45 @@
         var AD_REWARD_XP = 10;
         // localStorage key for mute preference.
         var AD_MUTE_KEY = "xmenu_ad_muted";
+        // Max user-triggered ad watches per day.
+        var AD_DAILY_MAX        = 5;
+        var AD_DAILY_COUNT_KEY  = "xmenu_ad_daily_count";
+        var AD_DAILY_DATE_KEY   = "xmenu_ad_daily_date";
 
-        var adManifest = [];
+        var adManifest   = [];
         var lastPlayedId = null;
+        var adIsShowing  = false; // prevent double-trigger
+
+        // ── Daily watch counter helpers ──────────────────────────────────────
+        function getTodayStr() {
+          return new Date().toISOString().slice(0, 10);
+        }
+        function getDailyWatchCount() {
+          try {
+            if (localStorage.getItem(AD_DAILY_DATE_KEY) !== getTodayStr()) return 0;
+            return parseInt(localStorage.getItem(AD_DAILY_COUNT_KEY) || "0", 10) || 0;
+          } catch (_) { return 0; }
+        }
+        function incrementDailyCount() {
+          try {
+            localStorage.setItem(AD_DAILY_DATE_KEY, getTodayStr());
+            localStorage.setItem(AD_DAILY_COUNT_KEY, String(getDailyWatchCount() + 1));
+          } catch (_) {}
+        }
+        function updateWatchAdButton() {
+          var btn     = document.getElementById("watchAdBtn");
+          var countEl = document.getElementById("watchAdCount");
+          if (!btn) return;
+          var remaining = Math.max(0, AD_DAILY_MAX - getDailyWatchCount());
+          var ok        = canWatchAd(remaining);
+          btn.disabled  = !ok;
+          btn.title     = remaining <= 0 ? "Daily limit reached. Come back tomorrow!" : "";
+          if (countEl) countEl.textContent = remaining + " / " + AD_DAILY_MAX + " left today";
+        }
+        function canWatchAd(remaining) {
+          var rem = (remaining !== undefined) ? remaining : Math.max(0, AD_DAILY_MAX - getDailyWatchCount());
+          return adManifest.length > 0 && rem > 0 && !adIsShowing;
+        }
 
         // Fetch the ad manifest once.
         fetch("ads/manifest.json", { cache: "no-store" })
@@ -2528,9 +2601,11 @@
           .then(function (data) {
             if (Array.isArray(data) && data.length > 0) {
               adManifest = data;
-              // Schedule first ad after the full interval.
+              // Schedule first auto-ad after the full interval.
               setTimeout(showAdOverlay, AD_INTERVAL_MS);
             }
+            // Update button now that we know if ads are available.
+            updateWatchAdButton();
           })
           .catch(function () { /* manifest unavailable – silently skip */ });
 
@@ -2543,14 +2618,15 @@
           return pool[Math.floor(Math.random() * pool.length)];
         }
 
-        function showAdOverlay() {
+        // isUserTriggered = true when the user explicitly clicked "Watch Ad for XP".
+        function showAdOverlay(isUserTriggered) {
           var ad = pickAd();
           if (!ad) {
-            // No ads available; reschedule and exit.
-            setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            if (!isUserTriggered) setTimeout(showAdOverlay, AD_INTERVAL_MS);
             return;
           }
           lastPlayedId = ad.id;
+          adIsShowing  = true;
 
           var overlay     = document.getElementById("adOverlay");
           var video       = document.getElementById("adVideo");
@@ -2560,7 +2636,7 @@
           var muteBtn     = document.getElementById("adMuteBtn");
           var countdown   = document.getElementById("adCountdown");
 
-          if (!overlay || !video) return;
+          if (!overlay || !video) { adIsShowing = false; return; }
 
           // Per-playback state.
           var rewardGranted = false;
@@ -2590,6 +2666,7 @@
 
           overlay.classList.add("visible");
           document.body.style.overflow = "hidden";
+          if (isUserTriggered) updateWatchAdButton();
 
           video.play().catch(function () {
             // Autoplay blocked even when muted – force muted and retry.
@@ -2664,10 +2741,34 @@
             document.body.style.overflow = "";
             video.src = "";
             countdown.textContent = "";
-            // Schedule next ad.
-            setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            adIsShowing = false;
+            if (isUserTriggered) {
+              // Re-enable the button (or keep disabled if limit reached).
+              updateWatchAdButton();
+            } else {
+              // Schedule next auto-ad.
+              setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            }
           }
         }
+
+        // ── Expose for the "Watch Ad for XP" button ─────────────────────────
+        window.xMenuAds = {
+          trigger: function () {
+            if (!canWatchAd()) return;
+            incrementDailyCount();
+            updateWatchAdButton();
+            showAdOverlay(true);
+          },
+          updateButton: updateWatchAdButton
+        };
+
+        // Wire the button click handler and set initial state once DOM is ready.
+        document.addEventListener("DOMContentLoaded", function () {
+          var btn = document.getElementById("watchAdBtn");
+          if (btn) btn.addEventListener("click", function () { window.xMenuAds.trigger(); });
+          updateWatchAdButton();
+        });
       })();
     </script>
 
