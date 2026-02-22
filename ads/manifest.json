@@ -1,0 +1,16 @@
+[
+  {
+    "id": "xmenu-promo-1",
+    "type": "video",
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "poster": "",
+    "title": "XMenu – Your iPad Experience"
+  },
+  {
+    "id": "xmenu-promo-2",
+    "type": "video",
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "poster": "",
+    "title": "Discover XMenu Features"
+  }
+]
