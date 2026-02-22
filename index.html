@@ -1005,7 +1005,159 @@
           width: 60px;
         }
       }
+
+      /* ── Membership panel ── */
+      .membership-panel {
+        background: rgba(30, 41, 59, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        display: grid;
+        gap: 24px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-16px);
+        pointer-events: none;
+        padding: 0 clamp(20px, 4vw, 36px);
+        transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease, padding 0.35s ease;
+      }
+      .membership-panel.membership-panel--open {
+        max-height: 2400px;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        padding: 32px clamp(20px, 4vw, 36px);
+      }
+      .membership-panel h2 { margin: 0; color: #f8fafc; font-size: 1.5rem; font-weight: 600; }
+      .membership-panel > div > p { color: #cbd5e1; font-size: 1rem; line-height: 1.6; }
+
+      .member-status-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 16px;
+        padding: 22px 24px;
+        display: grid;
+        gap: 16px;
+      }
+      .member-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .member-tier-icon {
+        font-size: 2.4rem;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .member-tier-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+      .member-xp-display {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        margin-top: 3px;
+      }
+      .xp-progress-wrap { display: grid; gap: 6px; }
+      .xp-progress-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.83rem;
+        color: #94a3b8;
+      }
+      .xp-bar-bg {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.18);
+        overflow: hidden;
+      }
+      .xp-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        transition: width 0.5s ease;
+      }
+
+      .member-perk-box {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 12px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .member-perk-label { font-size: 0.88rem; color: #94a3b8; }
+      .member-perk-code {
+        font-family: monospace;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #7dd3fc;
+        letter-spacing: .06em;
+      }
+      .copy-code-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid rgba(56,189,248,.35);
+        color: #7dd3fc;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all .2s;
+      }
+      .copy-code-btn:hover { background: rgba(56,189,248,.1); }
+
+      .tier-overview {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+      .tier-card {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 14px;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: all 0.25s ease;
+      }
+      .tier-card.tier-active {
+        border-color: rgba(56, 189, 248, 0.5);
+        background: rgba(56, 189, 248, 0.07);
+        box-shadow: 0 0 0 1px rgba(56,189,248,.2);
+      }
+      .tier-card-icon { font-size: 1.6rem; }
+      .tier-card-name { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; }
+      .tier-card-xp   { font-size: 0.8rem;  color: #94a3b8; }
+      .tier-card-perk { font-size: 0.82rem; color: #7dd3fc; margin-top: 2px; }
+
+      .xp-toast {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: rgba(15,23,42,.97);
+        border: 1px solid rgba(56,189,248,.4);
+        border-radius: 14px;
+        padding: 12px 20px;
+        color: #7dd3fc;
+        font-size: 0.9rem;
+        font-weight: 600;
+        z-index: 20000;
+        box-shadow: 0 8px 24px rgba(0,0,0,.5);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity .3s ease, transform .3s ease;
+        pointer-events: none;
+      }
+      .xp-toast.visible { opacity: 1; transform: translateY(0); }
     </style>
+    <script src="codes.js"></script>
   </head>
   <body>
     <div class="language-switcher">
@@ -1085,6 +1237,10 @@
 
           <button class="button yt-free" id="ytAdFreeBtn" type="button" aria-label="YouTube Ad Free">
             ▶ YouTube Ad Free
+          </button>
+
+          <button class="button secondary" id="membershipBtn" type="button" aria-label="View membership">
+            🏆 Membership
           </button>
         </div>
 
@@ -1195,6 +1351,48 @@
         </form>
       </section>
 
+      <!-- ── Membership Panel ── -->
+      <section class="membership-panel" id="membershipPanel" aria-label="Membership">
+        <div>
+          <h2>🏆 Your Membership</h2>
+          <p>Earn XP by entering codes to unlock membership tiers and exclusive discount codes for repairs.</p>
+        </div>
+
+        <!-- Current status card -->
+        <div class="member-status-card">
+          <div class="member-badge-row">
+            <span class="member-tier-icon" id="memberTierIcon">—</span>
+            <div>
+              <div class="member-tier-name" id="memberTierName">No Membership</div>
+              <div class="member-xp-display" id="memberXpDisplay">0 XP</div>
+            </div>
+          </div>
+
+          <!-- Progress to next tier -->
+          <div class="xp-progress-wrap" id="memberProgressWrap" style="display:none;">
+            <div class="xp-progress-labels">
+              <span id="memberProgressLabel">Progress to Bronze</span>
+              <span id="memberProgressXp">0 / 100 XP</span>
+            </div>
+            <div class="xp-bar-bg">
+              <div class="xp-bar-fill" id="memberProgressFill" style="width:0%;"></div>
+            </div>
+          </div>
+
+          <!-- Membership perk / discount code -->
+          <div class="member-perk-box" id="memberPerkBox" style="display:none;">
+            <span class="member-perk-label">Your discount code:</span>
+            <span class="member-perk-code" id="memberPerkCode">—</span>
+            <button class="copy-code-btn" id="copyMemberCodeBtn" type="button">📋 Copy</button>
+          </div>
+        </div>
+
+        <!-- Tier overview -->
+        <div class="tier-overview" id="tierOverview">
+          <!-- populated by JS from codes.js -->
+        </div>
+      </section>
+
       <section class="reviews" aria-label="Kundenbewertungen">
         <div class="review-card">
           <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
@@ -1216,6 +1414,8 @@
         <button class="secret-code-trigger" id="secretCodeTrigger" type="button" title="Enter a secret code">🔑</button>
       </footer>
     </main>
+
+    <div class="xp-toast" id="xpToast"></div>
 
     <div class="secret-modal-overlay" id="secretCodeModal" role="dialog" aria-modal="true" aria-label="Enter secret code">
       <div class="secret-modal-box">
@@ -1570,8 +1770,169 @@
       deviceTypeSelect.addEventListener("change", updatePriceEstimate);
 
       // ── Discount & Secret Codes ───────────────────────────────────────────
-      const DISCOUNT_CODES = {
-        "2026xrepairpro": { discount: 10 }
+      const _cfg               = (window.XMENU_CODE_CONFIG || {});
+      const DISCOUNT_CODES     = Object.assign({}, _cfg.DISCOUNT_CODES || { "2026xrepairpro": { discount: 10, xpReward: 50, maxUses: null } });
+      const MEMBER_CODES       = _cfg.MEMBERSHIP_DISCOUNT_CODES || {};
+      const ADMIN_CODE_KEY     = (_cfg.ADMIN_CODE || "admin123").toLowerCase();
+      const ADMIN_XP_REWARD    = _cfg.ADMIN_XP_REWARD || 100;
+      const MEMBERSHIP_TIERS   = _cfg.MEMBERSHIP_TIERS || [];
+
+      // Merge custom codes stored by admin panel into DISCOUNT_CODES at runtime
+      (function mergeAdminCustomCodes() {
+        try {
+          const custom = JSON.parse(localStorage.getItem("xmenu_admin_custom_codes") || "{}");
+          for (const [k, v] of Object.entries(custom)) {
+            // Validate structure before merging to prevent arbitrary injection
+            if (
+              typeof k === "string" && k.length > 0 && k.length <= 64 &&
+              typeof v === "object" && v !== null &&
+              typeof v.discount === "number" && v.discount >= 0 && v.discount <= 100 &&
+              !DISCOUNT_CODES[k]
+            ) {
+              DISCOUNT_CODES[k] = { discount: v.discount, xpReward: Number(v.xpReward) || 0, maxUses: v.maxUses || null };
+            }
+          }
+        } catch (e) { /* ignore */ }
+      })();
+
+      // ── XP / Membership system ────────────────────────────────────────────
+      // XP is stored per-user in localStorage.  The key switches from "guest"
+      // to the Supabase user-id once auth is resolved (see module script below).
+      let xpStorageKey = "xmenu_xp_guest";
+
+      function getXP() {
+        try { return parseInt(localStorage.getItem(xpStorageKey) || "0", 10) || 0; } catch { return 0; }
+      }
+      function setXP(val) {
+        try { localStorage.setItem(xpStorageKey, String(Math.max(0, val))); } catch {}
+      }
+      function addXP(amount) {
+        const newXP = getXP() + amount;
+        setXP(newXP);
+        return newXP;
+      }
+
+      // Track per-code usage (for maxUses enforcement)
+      function getCodeUsage(code) {
+        try { return JSON.parse(localStorage.getItem("xmenu_code_usage") || "{}"); } catch { return {}; }
+      }
+      function incrementCodeUsage(code) {
+        try {
+          const usage = getCodeUsage();
+          usage[code] = (usage[code] || 0) + 1;
+          localStorage.setItem("xmenu_code_usage", JSON.stringify(usage));
+        } catch {}
+      }
+
+      function getTierForXP(xp) {
+        let current = MEMBERSHIP_TIERS[0] || { id: "none", label: "No Membership", xpRequired: 0, color: "#64748b", icon: "—", discountCode: null, discountPct: 0 };
+        for (const tier of MEMBERSHIP_TIERS) {
+          if (xp >= tier.xpRequired) current = tier;
+        }
+        return current;
+      }
+
+      function getNextTier(currentTierId) {
+        const idx = MEMBERSHIP_TIERS.findIndex(t => t.id === currentTierId);
+        if (idx === -1 || idx === MEMBERSHIP_TIERS.length - 1) return null;
+        return MEMBERSHIP_TIERS[idx + 1];
+      }
+
+      // ── XP toast notification ─────────────────────────────────────────────
+      let xpToastTimer = null;
+      function showXpToast(msg) {
+        const toast = document.getElementById("xpToast");
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("visible");
+        if (xpToastTimer) clearTimeout(xpToastTimer);
+        xpToastTimer = setTimeout(() => toast.classList.remove("visible"), 3000);
+      }
+
+      // ── Membership panel render ───────────────────────────────────────────
+      function renderMembership() {
+        const xp          = getXP();
+        const tier        = getTierForXP(xp);
+        const nextTier    = getNextTier(tier.id);
+
+        // Badge row
+        const iconEl = document.getElementById("memberTierIcon");
+        const nameEl = document.getElementById("memberTierName");
+        const xpEl   = document.getElementById("memberXpDisplay");
+        if (iconEl) iconEl.textContent = tier.icon || "—";
+        if (nameEl) { nameEl.textContent = tier.label; nameEl.style.color = tier.color || "#f8fafc"; }
+        if (xpEl)   xpEl.textContent = xp.toLocaleString() + " XP";
+
+        // Progress to next tier
+        const progressWrap = document.getElementById("memberProgressWrap");
+        if (progressWrap) {
+          if (nextTier) {
+            progressWrap.style.display = "";
+            const prevXp  = tier.xpRequired;
+            const needed  = nextTier.xpRequired - prevXp;
+            const earned  = Math.min(xp - prevXp, needed);
+            const pct     = needed > 0 ? Math.round((earned / needed) * 100) : 100;
+            document.getElementById("memberProgressLabel").textContent = "Progress to " + nextTier.label;
+            document.getElementById("memberProgressXp").textContent    = xp.toLocaleString() + " / " + nextTier.xpRequired.toLocaleString() + " XP";
+            document.getElementById("memberProgressFill").style.width  = pct + "%";
+          } else {
+            progressWrap.style.display = "none";
+          }
+        }
+
+        // Perk / discount code
+        const perkBox  = document.getElementById("memberPerkBox");
+        const perkCode = document.getElementById("memberPerkCode");
+        if (perkBox) {
+          if (tier.discountCode) {
+            perkBox.style.display = "";
+            if (perkCode) perkCode.textContent = tier.discountCode;
+          } else {
+            perkBox.style.display = "none";
+          }
+        }
+
+        // Tier overview cards
+        const overview = document.getElementById("tierOverview");
+        if (overview && MEMBERSHIP_TIERS.length) {
+          overview.innerHTML = "";
+          MEMBERSHIP_TIERS.forEach(function(t) {
+            const card = document.createElement("div");
+            card.className = "tier-card" + (t.id === tier.id ? " tier-active" : "");
+
+            const iconEl2 = document.createElement("span");
+            iconEl2.className = "tier-card-icon";
+            iconEl2.textContent = t.icon || "—";
+
+            const nameEl2 = document.createElement("div");
+            nameEl2.className = "tier-card-name";
+            nameEl2.style.color = t.color || "#f8fafc";
+            nameEl2.textContent = t.label;
+
+            const xpEl2 = document.createElement("div");
+            xpEl2.className = "tier-card-xp";
+            xpEl2.textContent = t.xpRequired === 0 ? "Starting tier" : t.xpRequired.toLocaleString() + " XP";
+
+            const perkEl = document.createElement("div");
+            perkEl.className = "tier-card-perk";
+            perkEl.textContent = t.discountCode ? t.discountPct + "% discount code" : "No perk";
+
+            card.appendChild(iconEl2);
+            card.appendChild(nameEl2);
+            card.appendChild(xpEl2);
+            card.appendChild(perkEl);
+            overview.appendChild(card);
+          });
+        }
+      }
+
+      // Expose so the Supabase module can switch the storage key once user is known
+      window.xmenuMembership = {
+        setUserId(uid) {
+          if (uid) xpStorageKey = "xmenu_xp_" + uid;
+          renderMembership();
+        },
+        renderMembership
       };
 
       const SECRET_UI_CODES = {
@@ -1586,12 +1947,34 @@
       const applyCodeBtn      = document.getElementById("applyCodeBtn");
       const codeFeedback      = document.getElementById("codeFeedback");
 
+      // Award XP and notify user; check for tier upgrades
+      function awardXP(amount, label) {
+        const prevTier = getTierForXP(getXP());
+        const newXP    = addXP(amount);
+        const newTier  = getTierForXP(newXP);
+        renderMembership();
+        showXpToast("+" + amount + " XP! (" + label + ") — " + newXP.toLocaleString() + " XP total");
+        // Announce tier upgrade
+        if (newTier.id !== prevTier.id && newTier.id !== "none") {
+          setTimeout(() => showXpToast("🎉 " + newTier.icon + " " + newTier.label + " tier unlocked!"), 3200);
+        }
+        incrementCodeUsage(label.toLowerCase());
+      }
+
       function applyDiscountCode() {
         const raw        = (discountCodeInput.value || "").trim();
         const normalized = raw.toLowerCase();
         const t          = translations[currentLang];
 
-        // Check secret UI codes first
+        if (!raw) {
+          appliedCode     = null;
+          appliedDiscount = 0;
+          codeFeedback.textContent = "";
+          codeFeedback.className   = "code-feedback";
+          return;
+        }
+
+        // 1. Secret UI codes (theme unlock, etc.)
         if (SECRET_UI_CODES[normalized]) {
           const action = SECRET_UI_CODES[normalized].action;
           if (action === "theme_panel") {
@@ -1603,23 +1986,68 @@
           return;
         }
 
-        // Check discount codes
+        // 2. Admin code – awards XP, does not apply discount
+        if (normalized === ADMIN_CODE_KEY) {
+          awardXP(ADMIN_XP_REWARD, raw);
+          codeFeedback.textContent = "✓ Admin code accepted! +" + ADMIN_XP_REWARD + " XP";
+          codeFeedback.className   = "code-feedback success";
+          discountCodeInput.value  = "";
+          appliedCode     = null;
+          appliedDiscount = 0;
+          return;
+        }
+
+        // 3. Regular discount codes
         if (DISCOUNT_CODES[normalized]) {
+          const info = DISCOUNT_CODES[normalized];
+          // Check usage limit
+          const usage = getCodeUsage();
+          if (info.maxUses != null && (usage[normalized] || 0) >= info.maxUses) {
+            codeFeedback.textContent = "✗ This code has reached its usage limit.";
+            codeFeedback.className   = "code-feedback error";
+            return;
+          }
           appliedCode     = raw;
-          appliedDiscount = DISCOUNT_CODES[normalized].discount;
+          appliedDiscount = info.discount;
           codeFeedback.textContent = t.support.codeApplied.replace("{discount}", appliedDiscount);
           codeFeedback.className   = "code-feedback success";
-        } else if (raw.length > 0) {
-          appliedCode     = null;
-          appliedDiscount = 0;
-          codeFeedback.textContent = t.support.codeInvalid;
-          codeFeedback.className   = "code-feedback error";
-        } else {
-          appliedCode     = null;
-          appliedDiscount = 0;
-          codeFeedback.textContent = "";
-          codeFeedback.className   = "code-feedback";
+          // Award XP once per code (first use by this user)
+          const xpUsageKey = "xmenu_code_xp_used_" + normalized;
+          const alreadyAwarded = (() => { try { return localStorage.getItem(xpUsageKey) === "1"; } catch { return false; } })();
+          if (!alreadyAwarded && info.xpReward) {
+            awardXP(info.xpReward, raw);
+            try { localStorage.setItem(xpUsageKey, "1"); } catch {}
+          }
+          return;
         }
+
+        // 4. Membership discount codes (valid for any user who has that tier or higher)
+        const memberCodeKey = raw.toUpperCase();
+        if (MEMBER_CODES[memberCodeKey]) {
+          const info      = MEMBER_CODES[memberCodeKey];
+          const userTier  = getTierForXP(getXP());
+          const tiers     = MEMBERSHIP_TIERS;
+          const userIdx   = tiers.findIndex(tt => tt.id === userTier.id);
+          const reqIdx    = tiers.findIndex(tt => tt.id === info.tier);
+          if (userIdx !== -1 && reqIdx !== -1 && userIdx >= reqIdx) {
+            appliedCode     = raw;
+            appliedDiscount = info.discount;
+            codeFeedback.textContent = t.support.codeApplied.replace("{discount}", appliedDiscount);
+            codeFeedback.className   = "code-feedback success";
+            incrementCodeUsage(memberCodeKey.toLowerCase());
+          } else {
+            const needed = MEMBERSHIP_TIERS[reqIdx] ? MEMBERSHIP_TIERS[reqIdx].label : info.tier;
+            codeFeedback.textContent = "✗ Requires " + needed + " membership.";
+            codeFeedback.className   = "code-feedback error";
+          }
+          return;
+        }
+
+        // 5. Invalid
+        appliedCode     = null;
+        appliedDiscount = 0;
+        codeFeedback.textContent = t.support.codeInvalid;
+        codeFeedback.className   = "code-feedback error";
       }
 
       applyCodeBtn.addEventListener("click", applyDiscountCode);
@@ -1635,9 +2063,17 @@
       const secretModalClose   = document.getElementById("secretModalClose");
 
       function submitSecretModal() {
-        const normalized = (secretModalInput.value || "").trim().toLowerCase();
+        const raw        = (secretModalInput.value || "").trim();
+        const normalized = raw.toLowerCase();
         secretModal.classList.remove("visible");
         secretModalInput.value = "";
+
+        // Admin code
+        if (normalized === ADMIN_CODE_KEY) {
+          awardXP(ADMIN_XP_REWARD, raw);
+          return;
+        }
+
         if (SECRET_UI_CODES[normalized]) {
           const action = SECRET_UI_CODES[normalized].action;
           if (action === "theme_panel") {
@@ -1658,6 +2094,38 @@
       secretModalInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") submitSecretModal();
         if (e.key === "Escape") { secretModal.classList.remove("visible"); secretModalInput.value = ""; }
+      });
+
+      // ── Membership panel toggle ───────────────────────────────────────────
+      const membershipBtn   = document.getElementById("membershipBtn");
+      const membershipPanel = document.getElementById("membershipPanel");
+
+      membershipBtn.addEventListener("click", () => {
+        const isOpen = membershipPanel.classList.contains("membership-panel--open");
+        if (!isOpen) {
+          // Close support panel if open
+          supportPanel.classList.remove("support-panel--open");
+          supportToggle.querySelector("[data-i18n]").textContent = translations[currentLang].header.support;
+
+          membershipPanel.classList.add("membership-panel--open");
+          renderMembership();
+          setTimeout(() => {
+            membershipPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 10);
+        } else {
+          membershipPanel.classList.remove("membership-panel--open");
+        }
+      });
+
+      // Copy membership discount code to clipboard
+      document.getElementById("copyMemberCodeBtn").addEventListener("click", () => {
+        const code = document.getElementById("memberPerkCode").textContent;
+        if (!code || code === "—") return;
+        navigator.clipboard.writeText(code).then(() => {
+          showXpToast("📋 Code copied: " + code);
+        }).catch(() => {
+          showXpToast("Copy failed – code: " + code);
+        });
       });
 
       // Customization panel
@@ -1776,6 +2244,7 @@
       })();
 
       start();
+      renderMembership();
     </script>
 
     <div class="yt-modal-overlay" id="ytModal" role="dialog" aria-modal="true" aria-label="YouTube Ad Free">
@@ -1952,10 +2421,15 @@
           accountBtn.href =
             "https://accounts.xmenu.dev/?returnTo=" +
             encodeURIComponent("https://xmenu.dev/");
+          // Guest mode – refresh membership with guest key
+          if (window.xmenuMembership) window.xmenuMembership.setUserId(null);
           return;
         }
 
         await ensureProfileRow(user.id);
+
+        // Switch XP storage to this user's key and refresh membership display
+        if (window.xmenuMembership) window.xmenuMembership.setUserId(user.id);
 
         const { data: profile } = await supabase
           .from("profiles")
