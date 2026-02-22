@@ -1156,6 +1156,116 @@
         pointer-events: none;
       }
       .xp-toast.visible { opacity: 1; transform: translateY(0); }
+
+      /* ── Rewarded Ad Overlay ── */
+      .ad-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.82);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 30000;
+        backdrop-filter: blur(6px);
+      }
+      .ad-overlay.visible { display: flex; }
+
+      .ad-box {
+        position: relative;
+        width: min(60vw, 860px);
+        background: rgba(15, 23, 42, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+      }
+      @media (max-width: 700px) {
+        .ad-box { width: min(96vw, 860px); }
+      }
+
+      .ad-box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px 10px;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      .ad-box-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+      }
+
+      .ad-box-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .ad-mute-btn, .ad-skip-btn {
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 10px;
+        color: #e2e8f0;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+      }
+      .ad-mute-btn:hover { background: rgba(51, 65, 85, 0.9); }
+      .ad-skip-btn { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; }
+      .ad-skip-btn:hover:not(:disabled) { background: rgba(56, 189, 248, 0.22); }
+      .ad-skip-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: rgba(30, 41, 59, 0.7);
+        color: #64748b;
+      }
+
+      .ad-video-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+      }
+      .ad-video-wrap video {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+      }
+
+      .ad-countdown {
+        position: absolute;
+        bottom: 10px;
+        left: 12px;
+        background: rgba(0,0,0,.6);
+        color: #e2e8f0;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
+      .ad-box-footer {
+        padding: 8px 16px 10px;
+        font-size: 0.72rem;
+        color: #475569;
+        text-align: center;
+      }
     </style>
     <script src="codes.js"></script>
   </head>
@@ -1416,6 +1526,24 @@
     </main>
 
     <div class="xp-toast" id="xpToast"></div>
+
+    <!-- ── Rewarded Ad Overlay ── -->
+    <div class="ad-overlay" id="adOverlay" role="dialog" aria-modal="true" aria-label="Ad">
+      <div class="ad-box">
+        <div class="ad-box-header">
+          <span class="ad-box-title" id="adTitle">Advertisement</span>
+          <div class="ad-box-controls">
+            <button class="ad-mute-btn" id="adMuteBtn" type="button" aria-label="Toggle mute">🔇 Unmute</button>
+            <button class="ad-skip-btn" id="adSkipBtn" type="button" disabled aria-label="Skip ad">Skip in <span id="adSkipCountdown">5</span>s</button>
+          </div>
+        </div>
+        <div class="ad-video-wrap">
+          <video id="adVideo" playsinline preload="metadata"></video>
+          <div class="ad-countdown" id="adCountdown" aria-live="polite"></div>
+        </div>
+        <div class="ad-box-footer">Watch the full ad to earn +10 XP 🎯</div>
+      </div>
+    </div>
 
     <div class="secret-modal-overlay" id="secretCodeModal" role="dialog" aria-modal="true" aria-label="Enter secret code">
       <div class="secret-modal-box">
@@ -2376,6 +2504,170 @@
             console.debug("Volume postMessage failed (cross-origin restriction):", err);
           }
         });
+      })();
+    </script>
+
+    <script>
+      // ── Rewarded Ad Overlay ─────────────────────────────────────────────────
+      (function () {
+        // How often to show the ad (ms). Change this constant to adjust the interval.
+        var AD_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+        // Seconds the user must watch before skip becomes available.
+        var AD_SKIP_GATE_S = 5;
+        // XP rewarded for watching the full ad.
+        var AD_REWARD_XP = 10;
+        // localStorage key for mute preference.
+        var AD_MUTE_KEY = "xmenu_ad_muted";
+
+        var adManifest = [];
+        var lastPlayedId = null;
+
+        // Fetch the ad manifest once.
+        fetch("ads/manifest.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (data) {
+            if (Array.isArray(data) && data.length > 0) {
+              adManifest = data;
+              // Schedule first ad after the full interval.
+              setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            }
+          })
+          .catch(function () { /* manifest unavailable – silently skip */ });
+
+        function pickAd() {
+          if (adManifest.length === 0) return null;
+          if (adManifest.length === 1) return adManifest[0];
+          // Avoid immediate repeat when possible.
+          var pool = adManifest.filter(function (a) { return a.id !== lastPlayedId; });
+          if (pool.length === 0) pool = adManifest;
+          return pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        function showAdOverlay() {
+          var ad = pickAd();
+          if (!ad) {
+            // No ads available; reschedule and exit.
+            setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            return;
+          }
+          lastPlayedId = ad.id;
+
+          var overlay     = document.getElementById("adOverlay");
+          var video       = document.getElementById("adVideo");
+          var titleEl     = document.getElementById("adTitle");
+          var skipBtn     = document.getElementById("adSkipBtn");
+          var skipCd      = document.getElementById("adSkipCountdown");
+          var muteBtn     = document.getElementById("adMuteBtn");
+          var countdown   = document.getElementById("adCountdown");
+
+          if (!overlay || !video) return;
+
+          // Per-playback state.
+          var rewardGranted = false;
+          var gateTimer     = null;
+          var gateSeconds   = AD_SKIP_GATE_S;
+
+          // Restore mute preference (start muted by default).
+          var isMuted = localStorage.getItem(AD_MUTE_KEY) !== "false";
+          video.muted = isMuted;
+          muteBtn.textContent = isMuted ? "🔇 Unmute" : "🔊 Mute";
+
+          // Set up video.
+          video.src    = ad.src;
+          if (ad.poster) video.poster = ad.poster;
+          titleEl.textContent = ad.title || "Advertisement";
+
+          // Reset skip gate.
+          skipBtn.disabled     = true;
+          skipCd.textContent   = String(AD_SKIP_GATE_S);
+          var skipLabel        = document.createTextNode("Skip in ");
+          skipBtn.textContent  = "";
+          skipBtn.appendChild(skipLabel);
+          skipBtn.appendChild(skipCd);
+          var sAfter = document.createTextNode("s");
+          skipBtn.appendChild(sAfter);
+          countdown.textContent = "";
+
+          overlay.classList.add("visible");
+          document.body.style.overflow = "hidden";
+
+          video.play().catch(function () {
+            // Autoplay blocked even when muted – force muted and retry.
+            video.muted = true;
+            isMuted = true;
+            muteBtn.textContent = "🔇 Unmute";
+            try { localStorage.setItem(AD_MUTE_KEY, "true"); } catch (_) {}
+            video.play().catch(function () {});
+          });
+
+          // Countdown gate: tick every second for AD_SKIP_GATE_S seconds.
+          gateTimer = setInterval(function () {
+            gateSeconds -= 1;
+            if (gateSeconds <= 0) {
+              clearInterval(gateTimer);
+              skipBtn.disabled    = false;
+              skipBtn.textContent = "✕ Skip";
+              countdown.textContent = "";
+            } else {
+              skipCd.textContent = String(gateSeconds);
+            }
+          }, 1000);
+
+          // Show remaining duration while video plays.
+          function updateCountdown() {
+            if (!isFinite(video.duration) || video.duration <= 0) return;
+            var remaining = Math.max(0, Math.ceil(video.duration - video.currentTime));
+            if (remaining > 0) {
+              countdown.textContent = remaining + "s";
+            } else {
+              countdown.textContent = "";
+            }
+          }
+          video.addEventListener("timeupdate", updateCountdown);
+
+          // Reward granted when video ends naturally.
+          function onVideoEnded() {
+            if (!rewardGranted) {
+              rewardGranted = true;
+              var newXP = addXP(AD_REWARD_XP);
+              renderMembership();
+              showXpToast("🎬 +" + AD_REWARD_XP + " XP! (Watched ad) — " + newXP.toLocaleString() + " XP total");
+            }
+            closeAd();
+          }
+          video.addEventListener("ended", onVideoEnded);
+
+          // Mute toggle.
+          function onMuteClick() {
+            isMuted = !isMuted;
+            video.muted = isMuted;
+            muteBtn.textContent = isMuted ? "🔇 Unmute" : "🔊 Mute";
+            try { localStorage.setItem(AD_MUTE_KEY, isMuted ? "true" : "false"); } catch (_) {}
+          }
+          muteBtn.addEventListener("click", onMuteClick);
+
+          // Skip / close button.
+          function onSkipClick() {
+            if (skipBtn.disabled) return;
+            closeAd();
+          }
+          skipBtn.addEventListener("click", onSkipClick);
+
+          function closeAd() {
+            if (gateTimer) clearInterval(gateTimer);
+            video.pause();
+            video.removeEventListener("timeupdate", updateCountdown);
+            video.removeEventListener("ended", onVideoEnded);
+            muteBtn.removeEventListener("click", onMuteClick);
+            skipBtn.removeEventListener("click", onSkipClick);
+            overlay.classList.remove("visible");
+            document.body.style.overflow = "";
+            video.src = "";
+            countdown.textContent = "";
+            // Schedule next ad.
+            setTimeout(showAdOverlay, AD_INTERVAL_MS);
+          }
+        }
       })();
     </script>
 
