@@ -19,7 +19,7 @@ window.XMENU_CODE_CONFIG = (function () {
   // This code grants XP every time it is entered and has unlimited uses.
   // The admin code itself is NOT a discount code – it only awards XP.
   const ADMIN_CODE = "admin123";
-  const ADMIN_XP_REWARD = 100;
+  const ADMIN_XP_REWARD = 1000;
 
   // ── Membership Tier Discount Codes ───────────────────────────────────────
   // These codes are automatically revealed to members of the matching tier (or higher).
