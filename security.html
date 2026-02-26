@@ -17,49 +17,23 @@
           </svg>
         </div>
         <div>
-          <h1>Sicherheitsprüfung</h1>
-          <p>Verifizierung, dass du ein Mensch bist — XMenu</p>
+          <h1>Schnelle Überprüfung</h1>
+          <p>Bestätige kurz, dass du ein Mensch bist — XMenu</p>
         </div>
       </div>
 
       <!-- ── Inhalt ── -->
       <div class="card-body">
 
-        <!-- Lade-Spinner -->
-        <div id="loading">
-          <div class="spinner" role="status" aria-label="Laden"></div>
-          <p id="loading-text">Sicherheitsprüfung wird initialisiert&hellip;</p>
-          <div id="countdown-display" style="display:none;">
-            <h3 style="font-size: 2rem; margin: 20px 0; color: var(--accent);">
-              <span id="countdown-number">10</span>
-            </h3>
-            <p>Bereite dich auf die Sicherheitsprüfung vor&hellip;</p>
-          </div>
-        </div>
-
-        <!-- Fragenbereich (versteckt bis Countdown abläuft) -->
-        <div id="challenges" style="display:none;">
-
-          <!-- Fortschritt -->
-          <div class="progress-wrap" aria-label="Prüfungsfortschritt">
-            <div class="progress-labels">
-              <span>Fortschritt</span>
-              <span><span class="progress-current">0</span> / 10 Fragen</span>
-            </div>
-            <div class="progress-bar-bg">
-              <div class="progress-bar-fill" style="width:0%"></div>
-            </div>
-          </div>
-
+        <!-- Fragenbereich -->
+        <div id="challenges">
           <!-- Aktuelle Frage -->
           <div id="question-area">
-            <div class="challenge-title" id="question-label">Frage 1 von 10</div>
             <div class="challenge-question" id="question-text" aria-live="polite"></div>
             <div class="choices" id="question-choices" role="group" aria-label="Antwortmöglichkeiten"></div>
             <div class="feedback" id="question-feedback" aria-live="assertive"></div>
           </div>
-
-        </div><!-- /#challenges -->
+        </div>
 
         <!-- ── Erfolgsmeldung ── -->
         <div id="success-screen">
@@ -68,9 +42,8 @@
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
-          <h2>Verifizierung abgeschlossen</h2>
+          <h2>Überprüfung abgeschlossen</h2>
           <p>
-            Du hast alle Sicherheitsfragen bestanden.<br>
             Du wirst zu <strong class="redirect-destination"></strong> weitergeleitet&hellip;
           </p>
           <div class="redirect-bar-bg">
