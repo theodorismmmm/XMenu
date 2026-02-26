@@ -7,64 +7,6 @@
     <title>XMenu - Your iPad Experience</title>
     <meta name="description" content="XMenu – the ultimate iPad menu experience. Browse, customize, and enjoy a seamless digital menu platform." />
     <link rel="icon" type="image/png" href="icon.png" />
-    <script>
-      // Redirect to local security verification
-      (function() {
-        // Helper function to safely get cookie value
-        function getCookie(name) {
-          const value = "; " + document.cookie;
-          const parts = value.split("; " + name + "=");
-          if (parts.length === 2) return parts.pop().split(";").shift();
-          return null;
-        }
-
-        // Check localStorage for persisted verification (fallback for environments
-        // where the Secure cookie flag may not work, e.g. HTTP dev servers)
-        function isLocalStorageVerified() {
-          try {
-            const expiry = parseInt(localStorage.getItem('xmenu_security_expiry') || '0');
-            return localStorage.getItem('xmenu_security_verified') === 'true' && Date.now() < expiry;
-          } catch (e) {
-            return false;
-          }
-        }
-
-        function storeVerification() {
-          const expiryMs = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-          // Cookie (works when served over HTTPS)
-          const expires = new Date(expiryMs).toUTCString();
-          document.cookie = "xmenu_security_verified=true; expires=" + expires + "; path=/; SameSite=Lax";
-          // localStorage fallback (works in all environments)
-          try {
-            localStorage.setItem('xmenu_security_verified', 'true');
-            localStorage.setItem('xmenu_security_expiry', expiryMs.toString());
-          } catch (e) { /* storage unavailable */ }
-        }
-        
-        // Check if user was just verified (via URL parameter, cookie, or localStorage)
-        const urlParams = new URLSearchParams(window.location.search);
-        const isVerified = urlParams.get('verified') === 'true' || 
-                          getCookie('xmenu_security_verified') === 'true' ||
-                          isLocalStorageVerified();
-        
-        if (!isVerified) {
-          // Not verified – redirect to local security check
-          const currentUrl = encodeURIComponent(window.location.href);
-          window.location.replace("security.html?returnTo=" + currentUrl);
-        } else if (urlParams.get('verified')) {
-          // User just passed the security check – persist verification so the
-          // site stays unlocked for this user without requiring re-verification.
-          storeVerification();
-
-          // Clean up verification parameter while preserving other params
-          urlParams.delete('verified');
-          const search = urlParams.toString();
-          const cleanUrl = window.location.origin + window.location.pathname + 
-                          (search ? '?' + search : '') + window.location.hash;
-          window.history.replaceState({}, document.title, cleanUrl);
-        }
-      })();
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1660,7 +1602,7 @@
             issue: "Describe your problem",
             issuePlaceholder: "Brief description of the problem…",
             submit: "Request Support",
-            helper: "A security check is required before sending. Your email client will then open.",
+            helper: "Your email client will open to send the request.",
             discountCode: "Discount Code (optional)",
             discountCodePlaceholder: "Enter code (e.g. 2026Xrepairpro)",
             applyCode: "Apply",
@@ -1736,7 +1678,7 @@
             issuePlaceholder: "Kurze Beschreibung des Problems…",
             submit: "Support anfragen",
             helper:
-              "Eine Sicherheitsprüfung ist erforderlich. Danach öffnet sich dein E-Mail-Programm.",
+              "Dein E-Mail-Programm öffnet sich zum Senden der Anfrage.",
             discountCode: "Rabattcode (optional)",
             discountCodePlaceholder: "Code eingeben (z. B. 2026Xrepairpro)",
             applyCode: "Anwenden",
@@ -2345,70 +2287,22 @@
         const model      = String(formData.get("model")      || "");
         const issue      = String(formData.get("issue")      || "");
 
-        // Persist form data for after the security check
-        let dataSaved = false;
-        try {
-          sessionStorage.setItem("xmenu_support_data", JSON.stringify({
-            deviceType, brand, model, issue, lang: currentLang,
-            discountCode: appliedCode || "",
-            discountPct:  appliedDiscount
-          }));
-          dataSaved = true;
-        } catch (e) { /* storage unavailable */ }
-
-        if (!dataSaved) {
-          alert("Unable to save your form data (storage unavailable). Please disable private browsing or try a different browser, then resubmit.");
-          return;
+        const tData = translations[currentLang];
+        const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
+        const bodyLines = [
+          `${tData.support.deviceType}: ${deviceType}`,
+          `${tData.support.brand}: ${brand}`,
+          `${tData.support.model}: ${model}`,
+          "",
+          issue
+        ];
+        if (appliedCode) {
+          bodyLines.push("");
+          bodyLines.push(`Used code: ${appliedCode} | Discount: ${appliedDiscount}%`);
         }
-
-        // Redirect to security check; on return the action param triggers the mailto
-        const returnTo = window.location.origin + window.location.pathname + "?action=send_support";
-        window.location.href = "security.html?returnTo=" + encodeURIComponent(returnTo);
+        const body = encodeURIComponent(bodyLines.join("\n"));
+        window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
       });
-
-      const savedLang = localStorage.getItem("xmenu-lang") || "en";
-      setLanguage(savedLang);
-
-      // ── Handle pending support send (return from security check) ──────────
-      (function handlePendingSupportAction() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get("action") !== "send_support") return;
-
-        // Clean action param from URL
-        params.delete("action");
-        const cleanSearch = params.toString();
-        const cleanUrl = window.location.origin + window.location.pathname + (cleanSearch ? "?" + cleanSearch : "");
-        window.history.replaceState({}, document.title, cleanUrl);
-
-        try {
-          const saved = sessionStorage.getItem("xmenu_support_data");
-          if (!saved) {
-            alert("Your support request data could not be retrieved. Please fill out and submit the form again.");
-            return;
-          }
-          sessionStorage.removeItem("xmenu_support_data");
-
-          const { deviceType, brand, model, issue, lang, discountCode, discountPct } = JSON.parse(saved);
-          const tData = translations[lang] || translations[currentLang];
-
-          const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
-          const bodyLines = [
-            `${tData.support.deviceType}: ${deviceType}`,
-            `${tData.support.brand}: ${brand}`,
-            `${tData.support.model}: ${model}`,
-            "",
-            issue
-          ];
-          if (discountCode) {
-            bodyLines.push("");
-            bodyLines.push(`Used code: ${discountCode} | Discount: ${discountPct}%`);
-          }
-          const body = encodeURIComponent(bodyLines.join("\n"));
-          window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
-        } catch (e) {
-          alert("Your support request data could not be retrieved. Please fill out and submit the form again.");
-        }
-      })();
 
       start();
       renderMembership();
@@ -2848,6 +2742,99 @@
       });
 
       renderAccount();
+    </script>
+
+    <!-- ── 5-minute verification modal ── -->
+    <div id="xmenu-verify-overlay" role="dialog" aria-modal="true" aria-label="Quick Verification" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+      <div style="background:#1a1d27;border:1px solid #2e3350;border-radius:12px;padding:32px 28px;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+        <div style="font-size:28px;margin-bottom:12px;">🛡️</div>
+        <h2 style="font-size:17px;font-weight:700;margin-bottom:6px;color:#e2e8f0;">Quick Check</h2>
+        <p style="font-size:13px;color:#8892a4;margin-bottom:20px;">Please answer this quick question to keep using XMenu.</p>
+        <div id="xmenu-verify-question" style="font-size:20px;font-weight:700;color:#e2e8f0;margin-bottom:20px;"></div>
+        <div id="xmenu-verify-choices" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="xmenu-verify-feedback" style="font-size:13px;margin-top:12px;min-height:18px;"></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var STORAGE_KEY              = "xmenu_verify_expiry";
+        var SHOW_VERIFICATION_AFTER_MS = 5 * 60 * 1000; // 5 minutes
+        var VERIFICATION_VALID_HOURS   = 24;
+
+        var QUESTIONS = [
+          { q: "What is 3 + 4?",   choices: ["5", "6", "7"],   answer: "7"  },
+          { q: "What is 8 − 3?",   choices: ["4", "5", "6"],   answer: "5"  },
+          { q: "What is 2 × 5?",   choices: ["8", "10", "12"], answer: "10" },
+          { q: "What is 9 + 6?",   choices: ["13", "14", "15"], answer: "15" },
+          { q: "What is 12 ÷ 4?",  choices: ["2", "3", "4"],   answer: "3"  }
+        ];
+
+        function isVerified() {
+          try {
+            var expiry = parseInt(localStorage.getItem(STORAGE_KEY) || "0");
+            return Date.now() < expiry;
+          } catch (e) { return false; }
+        }
+
+        function storeVerified() {
+          try {
+            localStorage.setItem(STORAGE_KEY, (Date.now() + VERIFICATION_VALID_HOURS * 3600 * 1000).toString());
+          } catch (e) {}
+        }
+
+        if (isVerified()) return;
+
+        var overlay    = document.getElementById("xmenu-verify-overlay");
+        var questionEl = document.getElementById("xmenu-verify-question");
+        var choicesEl  = document.getElementById("xmenu-verify-choices");
+        var feedbackEl = document.getElementById("xmenu-verify-feedback");
+
+        function showCheck() {
+          var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+          questionEl.textContent = q.q;
+          choicesEl.innerHTML = "";
+          feedbackEl.textContent = "";
+
+          q.choices.forEach(function (c) {
+            var btn = document.createElement("button");
+            btn.textContent = c;
+            btn.style.cssText = "background:#22263a;border:1px solid #2e3350;border-radius:8px;padding:11px 16px;color:#e2e8f0;font-size:15px;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s;";
+            btn.addEventListener("mouseenter", function () {
+              btn.style.borderColor = "#4f6ef7";
+              btn.style.background  = "rgba(79,110,247,.2)";
+            });
+            btn.addEventListener("mouseleave", function () {
+              btn.style.borderColor = "#2e3350";
+              btn.style.background  = "#22263a";
+            });
+            btn.addEventListener("click", function () {
+              if (c === q.answer) {
+                feedbackEl.style.color = "#22c55e";
+                feedbackEl.textContent = "✓ Correct!";
+                storeVerified();
+                setTimeout(function () {
+                  overlay.style.display = "none";
+                }, 600);
+              } else {
+                feedbackEl.style.color = "#ef4444";
+                feedbackEl.textContent = "Wrong answer – try again.";
+                btn.style.borderColor = "#ef4444";
+                btn.style.background  = "rgba(239,68,68,.1)";
+                setTimeout(function () {
+                  btn.style.borderColor = "#2e3350";
+                  btn.style.background  = "#22263a";
+                  feedbackEl.textContent = "";
+                }, 900);
+              }
+            });
+            choicesEl.appendChild(btn);
+          });
+
+          overlay.style.display = "flex";
+        }
+
+        setTimeout(showCheck, SHOW_VERIFICATION_AFTER_MS);
+      })();
     </script>
   </body>
 </html>
