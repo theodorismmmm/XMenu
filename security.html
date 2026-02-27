@@ -1,399 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Security Verification - XMenu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        color-scheme: dark;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        background-color: #0f172a;
-        color: #e2e8f0;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
-        padding: 48px 20px;
-      }
-
-      .container {
-        width: min(600px, 100%);
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 28px;
-        padding: 56px clamp(24px, 5vw, 64px);
-        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.45);
-        backdrop-filter: blur(10px);
-      }
-
-      h1 {
-        margin: 0 0 16px;
-        font-size: clamp(1.8rem, 4vw, 2.4rem);
-        color: #f8fafc;
-        font-weight: 700;
-        line-height: 1.2;
-      }
-
-      .subtitle {
-        margin: 0 0 32px;
-        font-size: 1rem;
-        color: #cbd5e1;
-        line-height: 1.6;
-      }
-
-      .question {
-        margin-bottom: 24px;
-        padding: 20px;
-        background: rgba(30, 41, 59, 0.5);
-        border-radius: 12px;
-        border: 1px solid rgba(148, 163, 184, 0.15);
-      }
-
-      .question-label {
-        display: block;
-        margin-bottom: 12px;
-        font-size: 0.95rem;
-        color: #f8fafc;
-        font-weight: 600;
-      }
-
-      .question-input {
-        width: 100%;
-        padding: 12px 16px;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 8px;
-        color: #e2e8f0;
-        font-size: 0.95rem;
-        font-family: inherit;
-        transition: all 0.2s ease;
-      }
-
-      .question-input:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      }
-
-      .question-input::placeholder {
-        color: #64748b;
-      }
-
-      .submit-btn {
-        width: 100%;
-        padding: 14px 28px;
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-        border: none;
-        border-radius: 999px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-      }
-
-      .submit-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-      }
-
-      .submit-btn:active {
-        transform: translateY(0);
-      }
-
-      .error-message {
-        margin-top: 16px;
-        padding: 12px 16px;
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 8px;
-        color: #fca5a5;
-        font-size: 0.9rem;
-        display: none;
-      }
-
-      .error-message.show {
-        display: block;
-      }
-
-      .info-box {
-        margin-bottom: 24px;
-        padding: 16px;
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        border-radius: 12px;
-        color: #93c5fd;
-        font-size: 0.9rem;
-        line-height: 1.6;
-      }
-
-      .loader {
-        display: none;
-        text-align: center;
-        margin-top: 16px;
-      }
-
-      .loader.show {
-        display: block;
-      }
-
-      .loader-text {
-        color: #94a3b8;
-        font-size: 0.9rem;
-      }
-
-      .attempts-warning {
-        margin-top: 16px;
-        padding: 12px 16px;
-        background: rgba(251, 191, 36, 0.1);
-        border: 1px solid rgba(251, 191, 36, 0.3);
-        border-radius: 8px;
-        color: #fcd34d;
-        font-size: 0.9rem;
-        display: none;
-      }
-
-      .attempts-warning.show {
-        display: block;
-      }
-    </style>
+    <title>Sicherheitsprüfung - XMenu</title>
+    <link rel="stylesheet" href="assets/security/styles.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>🛡️ Security Verification</h1>
-      <p class="subtitle">
-        Please answer the following questions to verify you're human and gain access to XMenu.
-      </p>
 
-      <div class="info-box">
-        <strong>Why am I seeing this?</strong><br />
-        This security check helps protect XMenu from automated bots and ensures a safe experience for all users.
+    <div class="card">
+      <!-- ── Kopfzeile ── -->
+      <div class="card-header">
+        <div class="shield-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7L12 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Schnelle Überprüfung</h1>
+          <p>Bestätige kurz, dass du ein Mensch bist — XMenu</p>
+        </div>
       </div>
 
-      <form id="securityForm">
-        <div class="question">
-          <label class="question-label" for="q1">
-            What is the result of 7 + 5?
-          </label>
-          <input
-            type="text"
-            id="q1"
-            name="q1"
-            class="question-input"
-            placeholder="Enter your answer"
-            required
-          />
+      <!-- ── Inhalt ── -->
+      <div class="card-body">
+
+        <!-- Fragenbereich -->
+        <div id="challenges">
+          <!-- Aktuelle Frage -->
+          <div id="question-area">
+            <div class="challenge-question" id="question-text" aria-live="polite"></div>
+            <div class="choices" id="question-choices" role="group" aria-label="Antwortmöglichkeiten"></div>
+            <div class="feedback" id="question-feedback" aria-live="assertive"></div>
+          </div>
         </div>
 
-        <div class="question">
-          <label class="question-label" for="q2">
-            What color is the sky on a clear day?
-          </label>
-          <input
-            type="text"
-            id="q2"
-            name="q2"
-            class="question-input"
-            placeholder="Enter your answer"
-            required
-          />
+        <!-- ── Erfolgsmeldung ── -->
+        <div id="success-screen">
+          <div class="success-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h2>Überprüfung abgeschlossen</h2>
+          <p>
+            Du wirst zu <strong class="redirect-destination"></strong> weitergeleitet&hellip;
+          </p>
+          <div class="redirect-bar-bg">
+            <div class="redirect-bar-fill"></div>
+          </div>
+          <p class="redirect-note" aria-live="polite">Weiterleitung&hellip;</p>
         </div>
 
-        <div class="question">
-          <label class="question-label" for="q3">
-            Complete the sequence: 2, 4, 6, 8, __
-          </label>
-          <input
-            type="text"
-            id="q3"
-            name="q3"
-            class="question-input"
-            placeholder="Enter the next number"
-            required
-          />
-        </div>
+      </div><!-- /.card-body -->
+    </div><!-- /.card -->
 
-        <button type="submit" class="submit-btn">Verify & Continue</button>
-
-        <div class="error-message" id="errorMessage"></div>
-        <div class="attempts-warning" id="attemptsWarning"></div>
-        <div class="loader" id="loader">
-          <div class="loader-text">Verifying your answers...</div>
-        </div>
-      </form>
-    </div>
-
-    <script>
-      // Anti-bot security verification logic
-      const securityForm = document.getElementById("securityForm");
-      const errorMessage = document.getElementById("errorMessage");
-      const attemptsWarning = document.getElementById("attemptsWarning");
-      const loader = document.getElementById("loader");
-
-      // Define correct answers (case-insensitive)
-      const correctAnswers = {
-        q1: ["12", "twelve"],
-        q2: ["blue", "blau"], // Support both English and German
-        q3: ["10", "ten"]
-      };
-
-      // Track attempts
-      const MAX_ATTEMPTS = 3;
-      let attempts = parseInt(sessionStorage.getItem("xmenu_security_attempts") || "0");
-
-      // Check if user has too many failed attempts
-      if (attempts >= MAX_ATTEMPTS) {
-        const lockoutTime = parseInt(sessionStorage.getItem("xmenu_security_lockout") || "0");
-        const now = Date.now();
-        const lockoutDuration = 5 * 60 * 1000; // 5 minutes
-
-        if (now < lockoutTime) {
-          const remainingTime = Math.ceil((lockoutTime - now) / 1000 / 60);
-          errorMessage.textContent = `Too many failed attempts. Please try again in ${remainingTime} minute(s).`;
-          errorMessage.classList.add("show");
-          securityForm.querySelector(".submit-btn").disabled = true;
-          securityForm.querySelector(".submit-btn").style.opacity = "0.5";
-          securityForm.querySelector(".submit-btn").style.cursor = "not-allowed";
-        } else {
-          // Reset attempts after lockout period
-          attempts = 0;
-          sessionStorage.setItem("xmenu_security_attempts", "0");
-          sessionStorage.removeItem("xmenu_security_lockout");
-        }
-      }
-
-      // Show attempts warning if there are failed attempts
-      if (attempts > 0 && attempts < MAX_ATTEMPTS) {
-        attemptsWarning.textContent = `⚠️ Warning: ${attempts} of ${MAX_ATTEMPTS} attempts used. ${MAX_ATTEMPTS - attempts} remaining.`;
-        attemptsWarning.classList.add("show");
-      }
-
-      securityForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        // Check if locked out
-        if (attempts >= MAX_ATTEMPTS) {
-          const lockoutTime = parseInt(sessionStorage.getItem("xmenu_security_lockout") || "0");
-          const now = Date.now();
-          if (now < lockoutTime) {
-            return;
-          }
-        }
-
-        // Show loader
-        loader.classList.add("show");
-        errorMessage.classList.remove("show");
-        attemptsWarning.classList.remove("show");
-
-        // Simulate verification delay (to prevent rapid attempts)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Get form data
-        const formData = new FormData(securityForm);
-        const answers = {
-          q1: formData.get("q1").trim().toLowerCase(),
-          q2: formData.get("q2").trim().toLowerCase(),
-          q3: formData.get("q3").trim().toLowerCase()
-        };
-
-        // Validate answers
-        let allCorrect = true;
-        for (const [key, value] of Object.entries(answers)) {
-          if (!correctAnswers[key].includes(value)) {
-            allCorrect = false;
-            break;
-          }
-        }
-
-        loader.classList.remove("show");
-
-        if (allCorrect) {
-          // Success! Generate verification token
-          const verificationToken = generateToken();
-          const expirationTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
-
-          // Store verification status
-          sessionStorage.setItem("xmenu_verified", "true");
-          sessionStorage.setItem("xmenu_verification_token", verificationToken);
-          sessionStorage.setItem("xmenu_verification_expiry", expirationTime.toString());
-          
-          // Reset attempts
-          sessionStorage.removeItem("xmenu_security_attempts");
-          sessionStorage.removeItem("xmenu_security_lockout");
-
-          // Get return URL from query parameter or default to home
-          const urlParams = new URLSearchParams(window.location.search);
-          const returnTo = urlParams.get("returnTo") || "https://xmenu.dev/";
-
-          // Redirect to main site with verified flag so it can set the 1-hour cookie
-          const separator = returnTo.includes("?") ? "&" : "?";
-          window.location.href = returnTo + separator + "verified=true";
-        } else {
-          // Incorrect answer
-          attempts++;
-          sessionStorage.setItem("xmenu_security_attempts", attempts.toString());
-
-          if (attempts >= MAX_ATTEMPTS) {
-            // Lock out user
-            const lockoutTime = Date.now() + (5 * 60 * 1000); // 5 minutes
-            sessionStorage.setItem("xmenu_security_lockout", lockoutTime.toString());
-            errorMessage.textContent = "Too many failed attempts. You've been locked out for 5 minutes.";
-            securityForm.querySelector(".submit-btn").disabled = true;
-            securityForm.querySelector(".submit-btn").style.opacity = "0.5";
-            securityForm.querySelector(".submit-btn").style.cursor = "not-allowed";
-          } else {
-            errorMessage.textContent = `Incorrect answer(s). Please try again. (${attempts}/${MAX_ATTEMPTS} attempts used)`;
-            attemptsWarning.textContent = `⚠️ Warning: ${attempts} of ${MAX_ATTEMPTS} attempts used. ${MAX_ATTEMPTS - attempts} remaining.`;
-            attemptsWarning.classList.add("show");
-          }
-          
-          errorMessage.classList.add("show");
-        }
-      });
-
-      // Generate a simple verification token
-      function generateToken() {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let token = "";
-        for (let i = 0; i < 32; i++) {
-          token += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return token;
-      }
-
-      // Check if already verified and redirect
-      const isVerified = sessionStorage.getItem("xmenu_verified") === "true";
-      const verificationExpiry = parseInt(sessionStorage.getItem("xmenu_verification_expiry") || "0");
-      const now = Date.now();
-
-      if (isVerified && now < verificationExpiry) {
-        // Already verified, redirect to home with verified flag so it can set the 1-hour cookie
-        const urlParams = new URLSearchParams(window.location.search);
-        const returnTo = urlParams.get("returnTo") || "https://xmenu.dev/";
-        const separator = returnTo.includes("?") ? "&" : "?";
-        window.location.href = returnTo + separator + "verified=true";
-      }
-    </script>
+    <script src="assets/security/script.js"></script>
   </body>
 </html>

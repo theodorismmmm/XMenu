@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin – XMenu Code Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
+        padding: 48px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+      }
+
+      /* ── Lock screen ── */
+      #lockScreen {
+        width: min(400px, 100%);
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 24px;
+        padding: 40px 36px;
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        align-items: center;
+        text-align: center;
+      }
+      #lockScreen h1 { font-size: 1.6rem; color: #f8fafc; }
+      #lockScreen p  { color: #94a3b8; font-size: 0.95rem; }
+
+      /* ── Main panel ── */
+      #adminPanel {
+        width: min(900px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+      #adminPanel.hidden { display: none; }
+      #lockScreen.hidden { display: none; }
+
+      /* ── Cards ── */
+      .card {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 28px 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .card h2 { font-size: 1.2rem; color: #f8fafc; font-weight: 600; }
+      .card-desc { font-size: 0.9rem; color: #94a3b8; }
+
+      /* ── Forms ── */
+      .form-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+      label { font-size: 0.88rem; color: #cbd5e1; display: grid; gap: 6px; font-weight: 500; }
+      input, select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      input:focus, select:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.1); }
+
+      /* ── Buttons ── */
+      .btn {
+        padding: 10px 20px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        color: #0f172a;
+        box-shadow: 0 8px 20px rgba(56,189,248,.3);
+      }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(56,189,248,.4); }
+      .btn-danger  { background: rgba(248,113,113,.15); border-color: rgba(248,113,113,.4); color: #fca5a5; }
+      .btn-danger:hover  { background: rgba(248,113,113,.25); }
+      .btn-ghost   { background: transparent; border-color: rgba(148,163,184,.35); color: #e2e8f0; }
+      .btn-ghost:hover   { background: rgba(148,163,184,.1); }
+      .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
+
+      /* ── Table ── */
+      .code-table { width: 100%; border-collapse: collapse; }
+      .code-table th, .code-table td {
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(148,163,184,.12);
+        font-size: 0.88rem;
+      }
+      .code-table th { color: #94a3b8; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: .05em; }
+      .code-table td { color: #e2e8f0; }
+      .code-table tr:last-child td { border-bottom: none; }
+      .code-table tr:hover td { background: rgba(148,163,184,.04); }
+
+      .badge-builtin  { background: rgba(56,189,248,.15); color: #7dd3fc; border-radius: 999px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600; }
+      .badge-custom   { background: rgba(74,222,128,.15); color: #86efac; border-radius: 999px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600; }
+      .badge-admin    { background: rgba(251,191,36,.15); color: #fde68a; border-radius: 999px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600; }
+      .badge-member   { background: rgba(167,139,250,.15); color: #c4b5fd; border-radius: 999px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600; }
+
+      /* ── Feedback ── */
+      .feedback { font-size: 0.85rem; min-height: 18px; }
+      .feedback.ok  { color: #4ade80; }
+      .feedback.err { color: #f87171; }
+
+      /* ── Section actions row ── */
+      .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+      /* ── Stats ── */
+      .stat-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+      .stat-card { background: rgba(30,41,59,.7); border: 1px solid rgba(148,163,184,.18); border-radius: 14px; padding: 16px 18px; }
+      .stat-num  { font-size: 1.6rem; font-weight: 700; color: #f8fafc; }
+      .stat-lbl  { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+
+      .back-link { color: #64748b; text-decoration: none; font-size: 0.88rem; }
+      .back-link:hover { color: #94a3b8; }
+    </style>
+    <script src="codes.js"></script>
+  </head>
+  <body>
+
+    <!-- ── Lock Screen ── -->
+    <div id="lockScreen">
+      <h1>🔐 Admin Panel</h1>
+      <p>Enter the admin code to access code management.</p>
+      <input type="password" id="adminPasswordInput" placeholder="Admin code…" autocomplete="off" style="width:100%; text-align:center;" />
+      <button class="btn btn-primary" id="adminUnlockBtn" style="width:100%;">Unlock</button>
+      <p class="feedback" id="lockFeedback"></p>
+      <a href="index.html" class="back-link">← Back to XMenu</a>
+    </div>
+
+    <!-- ── Admin Panel ── -->
+    <div id="adminPanel" class="hidden">
+
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h1 style="font-size:1.8rem; color:#f8fafc; font-weight:700;">⚙️ XMenu Code Manager</h1>
+          <p style="color:#94a3b8; font-size:0.9rem; margin-top:4px;">Manage discount codes, XP rewards, and view usage statistics.</p>
+        </div>
+        <div class="row">
+          <a href="index.html" class="btn btn-ghost">← Back to Site</a>
+          <button class="btn btn-danger btn-sm" id="adminLogoutBtn">Log out</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card">
+        <h2>📊 Overview</h2>
+        <div class="stat-grid" id="statsGrid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- Built-in / codes.js codes (read-only) -->
+      <div class="card">
+        <h2>📁 Built-in Codes <span style="font-size:.8rem;color:#64748b;font-weight:400;">(defined in codes.js)</span></h2>
+        <p class="card-desc">These codes are defined in <code style="color:#7dd3fc;">codes.js</code>. To change them, edit that file directly.</p>
+        <div style="overflow-x:auto;">
+          <table class="code-table" id="builtinTable">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Type</th>
+                <th>Discount</th>
+                <th>XP Reward</th>
+                <th>Max Uses</th>
+                <th>Times Used</th>
+              </tr>
+            </thead>
+            <tbody id="builtinTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Custom codes (stored in localStorage) -->
+      <div class="card">
+        <h2>✏️ Custom Codes <span style="font-size:.8rem;color:#64748b;font-weight:400;">(stored in browser)</span></h2>
+        <p class="card-desc">Custom codes you create here are stored in the browser's localStorage and merged with built-in codes at runtime. They will persist until cleared.</p>
+
+        <!-- Add form -->
+        <div style="border:1px solid rgba(148,163,184,.15); border-radius:14px; padding:20px 18px; display:grid; gap:14px;">
+          <strong style="color:#f1f5f9; font-size:.95rem;">Add New Code</strong>
+          <div class="form-grid">
+            <label>
+              Code string
+              <input type="text" id="newCodeStr" placeholder="e.g. SUMMER25" autocomplete="off" />
+            </label>
+            <label>
+              Discount %
+              <input type="number" id="newCodeDiscount" placeholder="0–100" min="0" max="100" />
+            </label>
+            <label>
+              XP Reward
+              <input type="number" id="newCodeXp" placeholder="e.g. 50" min="0" />
+            </label>
+            <label>
+              Max Uses (0 = unlimited)
+              <input type="number" id="newCodeMaxUses" placeholder="0" min="0" value="0" />
+            </label>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" id="addCodeBtn">＋ Add Code</button>
+            <span class="feedback" id="addCodeFeedback"></span>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="code-table" id="customTable">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Discount</th>
+                <th>XP Reward</th>
+                <th>Max Uses</th>
+                <th>Times Used</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customTbody">
+              <tr><td colspan="6" style="color:#64748b; text-align:center; padding:20px;">No custom codes yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Membership tier overview (read-only from codes.js) -->
+      <div class="card">
+        <h2>🏆 Membership Tiers <span style="font-size:.8rem;color:#64748b;font-weight:400;">(defined in codes.js)</span></h2>
+        <div style="overflow-x:auto;">
+          <table class="code-table" id="tierTable">
+            <thead>
+              <tr>
+                <th>Tier</th>
+                <th>XP Required</th>
+                <th>Discount Code</th>
+                <th>Discount %</th>
+              </tr>
+            </thead>
+            <tbody id="tierTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /#adminPanel -->
+
+    <script>
+    (function () {
+      "use strict";
+
+      const cfg = window.XMENU_CODE_CONFIG || {};
+      const BUILTIN_DISCOUNT = cfg.DISCOUNT_CODES        || {};
+      const BUILTIN_MEMBER   = cfg.MEMBERSHIP_DISCOUNT_CODES || {};
+      const ADMIN_CODE       = (cfg.ADMIN_CODE || "admin123").toLowerCase();
+      const ADMIN_XP         = cfg.ADMIN_XP_REWARD || 100;
+      const TIERS            = cfg.MEMBERSHIP_TIERS || [];
+
+      const LS_CUSTOM_CODES  = "xmenu_admin_custom_codes";
+      const LS_USAGE_KEY     = "xmenu_code_usage";
+      const LS_ADMIN_AUTH    = "xmenu_admin_authed";
+
+      // ── Persistence helpers ────────────────────────────────────────────────
+      function loadCustomCodes() {
+        try { return JSON.parse(localStorage.getItem(LS_CUSTOM_CODES) || "{}"); } catch { return {}; }
+      }
+      function saveCustomCodes(obj) {
+        localStorage.setItem(LS_CUSTOM_CODES, JSON.stringify(obj));
+      }
+      function loadUsage() {
+        try { return JSON.parse(localStorage.getItem(LS_USAGE_KEY) || "{}"); } catch { return {}; }
+      }
+
+      // ── Auth ───────────────────────────────────────────────────────────────
+      const lockScreen   = document.getElementById("lockScreen");
+      const adminPanel   = document.getElementById("adminPanel");
+      const pwInput      = document.getElementById("adminPasswordInput");
+      const unlockBtn    = document.getElementById("adminUnlockBtn");
+      const lockFeedback = document.getElementById("lockFeedback");
+
+      function unlock() {
+        const val = (pwInput.value || "").trim().toLowerCase();
+        if (val === ADMIN_CODE) {
+          lockScreen.classList.add("hidden");
+          adminPanel.classList.remove("hidden");
+          try { sessionStorage.setItem(LS_ADMIN_AUTH, "1"); } catch {}
+          renderAll();
+        } else {
+          lockFeedback.textContent = "Incorrect code.";
+          lockFeedback.className = "feedback err";
+          pwInput.value = "";
+          pwInput.focus();
+        }
+      }
+
+      // Auto-unlock if session is still active
+      try {
+        if (sessionStorage.getItem(LS_ADMIN_AUTH) === "1") {
+          lockScreen.classList.add("hidden");
+          adminPanel.classList.remove("hidden");
+          renderAll();
+        }
+      } catch {}
+
+      unlockBtn.addEventListener("click", unlock);
+      pwInput.addEventListener("keydown", (e) => { if (e.key === "Enter") unlock(); });
+
+      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+        try { sessionStorage.removeItem(LS_ADMIN_AUTH); } catch {}
+        lockScreen.classList.remove("hidden");
+        adminPanel.classList.add("hidden");
+        pwInput.value = "";
+        pwInput.focus();
+      });
+
+      // ── Render helpers ─────────────────────────────────────────────────────
+      function esc(str) {
+        return String(str).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+      }
+
+      function renderAll() {
+        renderStats();
+        renderBuiltin();
+        renderCustom();
+        renderTiers();
+      }
+
+      function renderStats() {
+        const usage   = loadUsage();
+        const custom  = loadCustomCodes();
+        const builtinCount = Object.keys(BUILTIN_DISCOUNT).length + Object.keys(BUILTIN_MEMBER).length + 1; // +1 admin
+        const customCount  = Object.keys(custom).length;
+        const totalUses    = Object.values(usage).reduce((s, v) => s + (v || 0), 0);
+
+        document.getElementById("statsGrid").innerHTML = `
+          <div class="stat-card"><div class="stat-num">${builtinCount}</div><div class="stat-lbl">Built-in codes</div></div>
+          <div class="stat-card"><div class="stat-num">${customCount}</div><div class="stat-lbl">Custom codes</div></div>
+          <div class="stat-card"><div class="stat-num">${totalUses}</div><div class="stat-lbl">Total code uses</div></div>
+          <div class="stat-card"><div class="stat-num">${TIERS.length - 1}</div><div class="stat-lbl">Membership tiers</div></div>
+        `;
+      }
+
+      function renderBuiltin() {
+        const usage  = loadUsage();
+        const rows   = [];
+
+        // Admin code
+        rows.push(`<tr>
+          <td><code style="color:#fde68a;">${esc(cfg.ADMIN_CODE || "Admin123")}</code></td>
+          <td><span class="badge-admin">Admin</span></td>
+          <td>—</td>
+          <td>${ADMIN_XP} XP</td>
+          <td>∞</td>
+          <td>${usage[(cfg.ADMIN_CODE || "admin123").toLowerCase()] || 0}</td>
+        </tr>`);
+
+        // Discount codes
+        for (const [code, info] of Object.entries(BUILTIN_DISCOUNT)) {
+          rows.push(`<tr>
+            <td><code style="color:#7dd3fc;">${esc(code)}</code></td>
+            <td><span class="badge-builtin">Discount</span></td>
+            <td>${esc(info.discount)}%</td>
+            <td>${info.xpReward != null ? info.xpReward + " XP" : "—"}</td>
+            <td>${info.maxUses != null ? info.maxUses : "∞"}</td>
+            <td>${usage[code] || 0}</td>
+          </tr>`);
+        }
+
+        // Membership codes
+        for (const [code, info] of Object.entries(BUILTIN_MEMBER)) {
+          rows.push(`<tr>
+            <td><code style="color:#c4b5fd;">${esc(code)}</code></td>
+            <td><span class="badge-member">Membership (${esc(info.tier)})</span></td>
+            <td>${esc(info.discount)}%</td>
+            <td>—</td>
+            <td>∞</td>
+            <td>${usage[code.toLowerCase()] || 0}</td>
+          </tr>`);
+        }
+
+        document.getElementById("builtinTbody").innerHTML = rows.join("");
+      }
+
+      function renderCustom() {
+        const custom = loadCustomCodes();
+        const usage  = loadUsage();
+        const keys   = Object.keys(custom);
+
+        if (keys.length === 0) {
+          document.getElementById("customTbody").innerHTML =
+            '<tr><td colspan="6" style="color:#64748b; text-align:center; padding:20px;">No custom codes yet.</td></tr>';
+          return;
+        }
+
+        const rows = keys.map((code) => {
+          const info = custom[code];
+          return `<tr>
+            <td><code style="color:#86efac;">${esc(code)}</code></td>
+            <td>${esc(info.discount)}%</td>
+            <td>${info.xpReward != null ? info.xpReward + " XP" : "—"}</td>
+            <td>${info.maxUses ? info.maxUses : "∞"}</td>
+            <td>${usage[code] || 0}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" data-delete="${esc(code)}">Delete</button>
+            </td>
+          </tr>`;
+        });
+
+        const tbody = document.getElementById("customTbody");
+        tbody.innerHTML = rows.join("");
+
+        tbody.querySelectorAll("[data-delete]").forEach((btn) => {
+          btn.addEventListener("click", () => deleteCustomCode(btn.getAttribute("data-delete")));
+        });
+      }
+
+      function renderTiers() {
+        const rows = TIERS.map((tier) => `<tr>
+          <td>${esc(tier.icon)} ${esc(tier.label)}</td>
+          <td>${tier.xpRequired === 0 ? "—" : tier.xpRequired + " XP"}</td>
+          <td>${tier.discountCode ? `<code style="color:#c4b5fd;">${esc(tier.discountCode)}</code>` : "—"}</td>
+          <td>${tier.discountPct ? tier.discountPct + "%" : "—"}</td>
+        </tr>`);
+        document.getElementById("tierTbody").innerHTML = rows.join("");
+      }
+
+      // ── Add custom code ────────────────────────────────────────────────────
+      document.getElementById("addCodeBtn").addEventListener("click", () => {
+        const fb       = document.getElementById("addCodeFeedback");
+        const codeStr  = (document.getElementById("newCodeStr").value || "").trim();
+        const discount = parseInt(document.getElementById("newCodeDiscount").value, 10);
+        const xpReward = parseInt(document.getElementById("newCodeXp").value, 10);
+        const maxUses  = parseInt(document.getElementById("newCodeMaxUses").value, 10) || 0;
+
+        if (!codeStr) {
+          fb.textContent = "Code string is required.";
+          fb.className = "feedback err";
+          return;
+        }
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+          fb.textContent = "Discount must be between 0 and 100.";
+          fb.className = "feedback err";
+          return;
+        }
+
+        const key    = codeStr.toLowerCase();
+        const custom = loadCustomCodes();
+
+        // Prevent overwriting built-in codes
+        if (BUILTIN_DISCOUNT[key] || BUILTIN_MEMBER[key.toUpperCase()] || BUILTIN_MEMBER[codeStr] || key === ADMIN_CODE) {
+          fb.textContent = "A built-in code with this name already exists.";
+          fb.className = "feedback err";
+          return;
+        }
+
+        custom[key] = {
+          discount,
+          xpReward: isNaN(xpReward) ? 0 : xpReward,
+          maxUses:  maxUses > 0 ? maxUses : null
+        };
+        saveCustomCodes(custom);
+
+        // Clear form
+        document.getElementById("newCodeStr").value     = "";
+        document.getElementById("newCodeDiscount").value = "";
+        document.getElementById("newCodeXp").value       = "";
+        document.getElementById("newCodeMaxUses").value  = "0";
+
+        fb.textContent = `✓ Code "${codeStr}" added.`;
+        fb.className = "feedback ok";
+
+        renderAll();
+      });
+
+      // ── Delete custom code ─────────────────────────────────────────────────
+      function deleteCustomCode(code) {
+        if (!confirm(`Delete code "${code}"?`)) return;
+        const custom = loadCustomCodes();
+        delete custom[code];
+        saveCustomCodes(custom);
+        renderAll();
+      }
+
+    })();
+    </script>
+  </body>
+</html>
