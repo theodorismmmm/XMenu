@@ -5,64 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XMenu - Your iPad Experience</title>
-    <script>
-      // Redirect to local security verification
-      (function() {
-        // Helper function to safely get cookie value
-        function getCookie(name) {
-          const value = "; " + document.cookie;
-          const parts = value.split("; " + name + "=");
-          if (parts.length === 2) return parts.pop().split(";").shift();
-          return null;
-        }
-
-        // Check localStorage for persisted verification (fallback for environments
-        // where the Secure cookie flag may not work, e.g. HTTP dev servers)
-        function isLocalStorageVerified() {
-          try {
-            const expiry = parseInt(localStorage.getItem('xmenu_security_expiry') || '0');
-            return localStorage.getItem('xmenu_security_verified') === 'true' && Date.now() < expiry;
-          } catch (e) {
-            return false;
-          }
-        }
-
-        function storeVerification() {
-          const expiryMs = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-          // Cookie (works when served over HTTPS)
-          const expires = new Date(expiryMs).toUTCString();
-          document.cookie = "xmenu_security_verified=true; expires=" + expires + "; path=/; SameSite=Lax";
-          // localStorage fallback (works in all environments)
-          try {
-            localStorage.setItem('xmenu_security_verified', 'true');
-            localStorage.setItem('xmenu_security_expiry', expiryMs.toString());
-          } catch (e) { /* storage unavailable */ }
-        }
-        
-        // Check if user was just verified (via URL parameter, cookie, or localStorage)
-        const urlParams = new URLSearchParams(window.location.search);
-        const isVerified = urlParams.get('verified') === 'true' || 
-                          getCookie('xmenu_security_verified') === 'true' ||
-                          isLocalStorageVerified();
-        
-        if (!isVerified) {
-          // Not verified – redirect to local security check
-          const currentUrl = encodeURIComponent(window.location.href);
-          window.location.replace("security.html?returnTo=" + currentUrl);
-        } else if (urlParams.get('verified')) {
-          // User just passed the security check – persist verification so the
-          // site stays unlocked for this user without requiring re-verification.
-          storeVerification();
-
-          // Clean up verification parameter while preserving other params
-          urlParams.delete('verified');
-          const search = urlParams.toString();
-          const cleanUrl = window.location.origin + window.location.pathname + 
-                          (search ? '?' + search : '') + window.location.hash;
-          window.history.replaceState({}, document.title, cleanUrl);
-        }
-      })();
-    </script>
+    <meta name="description" content="XMenu – the ultimate iPad menu experience. Browse, customize, and enjoy a seamless digital menu platform." />
+    <link rel="icon" type="image/png" href="icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -230,6 +174,65 @@
         display: flex;
         gap: 10px;
         align-items: center;
+      }
+
+      /* Reviews section */
+      .reviews {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .review-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .review-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 12px 32px rgba(56, 189, 248, 0.15);
+      }
+
+      .review-stars {
+        color: #facc15;
+        font-size: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .review-text {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+        font-style: italic;
+      }
+
+      .review-meta {
+        font-size: 0.82rem;
+        color: #64748b;
+      }
+
+      .review-meta strong {
+        color: #94a3b8;
+        font-weight: 600;
+      }
+
+      /* Impressum link in footer */
+      .impressum-link {
+        color: #64748b;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .impressum-link:hover {
+        color: #94a3b8;
       }
 
       .pill {
@@ -410,9 +413,23 @@
         background: rgba(30, 41, 59, 0.75);
         border: 1px solid rgba(148, 163, 184, 0.2);
         border-radius: 20px;
-        padding: 32px clamp(20px, 4vw, 36px);
         display: grid;
         gap: 20px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-16px);
+        pointer-events: none;
+        padding: 0 clamp(20px, 4vw, 36px);
+        transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease, padding 0.35s ease;
+      }
+
+      .support-panel.support-panel--open {
+        max-height: 3600px; /* large enough for any realistic form content */
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        padding: 32px clamp(20px, 4vw, 36px);
       }
 
       .support-panel h2 {
@@ -487,8 +504,247 @@
         line-height: 1.5;
       }
 
-      .support-panel[hidden] {
+      /* ── Discount code field ── */
+      .discount-code-row {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .discount-code-row input {
+        flex: 1;
+      }
+
+      .apply-code-btn {
+        padding: 12px 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: transparent;
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        white-space: nowrap;
+      }
+
+      .apply-code-btn:hover {
+        background: rgba(148, 163, 184, 0.1);
+        border-color: rgba(148, 163, 184, 0.6);
+      }
+
+      .code-feedback {
+        font-size: 0.85rem;
+        margin-top: 6px;
+        min-height: 18px;
+        display: block;
+      }
+
+      .code-feedback.success { color: #4ade80; }
+      .code-feedback.error   { color: #f87171; }
+
+      /* ── Secret code modal ── */
+      .secret-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
         display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10002;
+        backdrop-filter: blur(4px);
+      }
+
+      .secret-modal-overlay.visible {
+        display: flex;
+      }
+
+      .secret-modal-box {
+        background: rgba(15, 23, 42, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 18px;
+        padding: 28px 28px 22px;
+        width: min(360px, calc(100vw - 40px));
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+        display: grid;
+        gap: 14px;
+      }
+
+      .secret-modal-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f8fafc;
+        margin: 0;
+      }
+
+      .secret-modal-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .secret-modal-input {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .secret-modal-input:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+      }
+
+      .secret-modal-cancel {
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 4px 0;
+        font-family: inherit;
+        text-align: left;
+        transition: color 0.2s;
+      }
+
+      .secret-modal-cancel:hover { color: #94a3b8; }
+
+      /* ── Customization panel ── */
+      .customize-panel {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        background: rgba(15, 23, 42, 0.97);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 20px;
+        padding: 20px;
+        width: 260px;
+        z-index: 10001;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(12px);
+        display: none;
+        animation: fadeSlideIn 0.3s ease;
+      }
+
+      .customize-panel.visible {
+        display: block;
+      }
+
+      .customize-panel h3 {
+        font-size: 0.95rem;
+        color: #f8fafc;
+        font-weight: 600;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .theme-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .theme-btn {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(30, 41, 59, 0.8);
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        text-align: center;
+      }
+
+      .theme-btn:hover,
+      .theme-btn.active {
+        border-color: #38bdf8;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .close-customize {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0;
+        line-height: 1;
+      }
+
+      .close-customize:hover { color: #e2e8f0; }
+
+      .secret-code-trigger {
+        background: none;
+        border: none;
+        color: #475569;
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 4px 6px;
+        border-radius: 6px;
+        transition: color 0.2s;
+        font-family: inherit;
+      }
+
+      .secret-code-trigger:hover { color: #94a3b8; }
+
+      /* ── UI themes ── */
+      body.theme-ocean {
+        background: radial-gradient(circle at top, #0d2137, #050f1a 65%);
+      }
+      body.theme-ocean main {
+        background: rgba(5, 15, 26, 0.85);
+        border-color: rgba(34, 211, 238, 0.2);
+      }
+      body.theme-forest {
+        background: radial-gradient(circle at top, #0f2518, #060f0a 65%);
+      }
+      body.theme-forest main {
+        background: rgba(6, 15, 10, 0.85);
+        border-color: rgba(74, 222, 128, 0.2);
+      }
+      body.theme-sunset {
+        background: radial-gradient(circle at top, #2d1515, #1a0a0a 65%);
+      }
+      body.theme-sunset main {
+        background: rgba(26, 10, 10, 0.85);
+        border-color: rgba(251, 146, 60, 0.2);
+      }
+      body.theme-minimal {
+        background: #0a0a0a;
+      }
+      body.theme-minimal main {
+        background: rgba(10, 10, 10, 0.95);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: none;
+      }
+
+      .price-estimate {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        color: #7dd3fc;
+        font-weight: 500;
+        display: none;
+        animation: fadeSlideIn 0.3s ease;
+      }
+
+      @keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
 
       @media (max-width: 640px) {
@@ -515,7 +771,478 @@
           right: 16px;
         }
       }
+
+      /* ── YouTube Ad Free modal ── */
+      .yt-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10010;
+        backdrop-filter: blur(6px);
+        padding: 20px;
+      }
+
+      .yt-modal-overlay.visible {
+        display: flex;
+      }
+
+      .yt-modal-box {
+        width: min(1100px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        animation: fadeSlideIn 0.3s ease;
+      }
+
+      .yt-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .yt-modal-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .yt-iframe-wrap {
+        position: relative;
+        width: 100%;
+        height: 68vh;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: #000;
+        transition: height 0.3s ease;
+      }
+
+      .yt-iframe-wrap.fullscreen-mode {
+        height: 82vh;
+      }
+
+      .yt-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      .yt-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 14px;
+        padding: 12px 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .yt-ctrl-btn {
+        appearance: none;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(30, 41, 59, 0.8);
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 9px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .yt-ctrl-btn:hover {
+        background: rgba(56, 189, 248, 0.12);
+        border-color: rgba(56, 189, 248, 0.5);
+        color: #7dd3fc;
+        transform: translateY(-1px);
+      }
+
+      .yt-ctrl-btn.danger:hover {
+        background: rgba(248, 113, 113, 0.12);
+        border-color: rgba(248, 113, 113, 0.5);
+        color: #fca5a5;
+      }
+
+      .yt-volume-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .yt-volume-label {
+        font-size: 0.82rem;
+        color: #94a3b8;
+        white-space: nowrap;
+      }
+
+      .yt-volume-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 90px;
+        height: 4px;
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 999px;
+        outline: none;
+        cursor: pointer;
+        accent-color: #38bdf8;
+      }
+
+      .yt-url-input {
+        flex: 1;
+        min-width: 0;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-size: 0.85rem;
+        font-family: inherit;
+        transition: border-color 0.2s;
+        outline: none;
+      }
+
+      .yt-url-input:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+      }
+
+      .yt-spacer {
+        flex: 1;
+        min-width: 8px;
+      }
+
+      .button.yt-free {
+        background: linear-gradient(135deg, #ff0000, #cc0000);
+        color: #fff;
+        box-shadow: 0 10px 28px rgba(204, 0, 0, 0.35);
+      }
+
+      .button.yt-free:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(204, 0, 0, 0.45);
+      }
+
+      @media (max-width: 640px) {
+        .yt-iframe-wrap {
+          height: 45vh;
+        }
+        .yt-iframe-wrap.fullscreen-mode {
+          height: 60vh;
+        }
+        .yt-volume-slider {
+          width: 60px;
+        }
+      }
+
+      /* ── Membership panel ── */
+      .membership-panel {
+        background: rgba(30, 41, 59, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        display: grid;
+        gap: 24px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-16px);
+        pointer-events: none;
+        padding: 0 clamp(20px, 4vw, 36px);
+        transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease, padding 0.35s ease;
+      }
+      .membership-panel.membership-panel--open {
+        max-height: 2400px;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        padding: 32px clamp(20px, 4vw, 36px);
+      }
+      .membership-panel h2 { margin: 0; color: #f8fafc; font-size: 1.5rem; font-weight: 600; }
+      .membership-panel > div > p { color: #cbd5e1; font-size: 1rem; line-height: 1.6; }
+
+      .member-status-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 16px;
+        padding: 22px 24px;
+        display: grid;
+        gap: 16px;
+      }
+      .member-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .member-tier-icon {
+        font-size: 2.4rem;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .member-tier-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+      .member-xp-display {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        margin-top: 3px;
+      }
+      .xp-progress-wrap { display: grid; gap: 6px; }
+      .xp-progress-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.83rem;
+        color: #94a3b8;
+      }
+      .xp-bar-bg {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.18);
+        overflow: hidden;
+      }
+      .xp-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        transition: width 0.5s ease;
+      }
+
+      .member-perk-box {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 12px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .member-perk-label { font-size: 0.88rem; color: #94a3b8; }
+      .member-perk-code {
+        font-family: monospace;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #7dd3fc;
+        letter-spacing: .06em;
+      }
+      .copy-code-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid rgba(56,189,248,.35);
+        color: #7dd3fc;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all .2s;
+      }
+      .copy-code-btn:hover { background: rgba(56,189,248,.1); }
+
+      .tier-overview {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+      .tier-card {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 14px;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: all 0.25s ease;
+      }
+      .tier-card.tier-active {
+        border-color: rgba(56, 189, 248, 0.5);
+        background: rgba(56, 189, 248, 0.07);
+        box-shadow: 0 0 0 1px rgba(56,189,248,.2);
+      }
+      .tier-card-icon { font-size: 1.6rem; }
+      .tier-card-name { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; }
+      .tier-card-xp   { font-size: 0.8rem;  color: #94a3b8; }
+      .tier-card-perk { font-size: 0.82rem; color: #7dd3fc; margin-top: 2px; }
+
+      .xp-toast {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: rgba(15,23,42,.97);
+        border: 1px solid rgba(56,189,248,.4);
+        border-radius: 14px;
+        padding: 12px 20px;
+        color: #7dd3fc;
+        font-size: 0.9rem;
+        font-weight: 600;
+        z-index: 20000;
+        box-shadow: 0 8px 24px rgba(0,0,0,.5);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity .3s ease, transform .3s ease;
+        pointer-events: none;
+      }
+      .xp-toast.visible { opacity: 1; transform: translateY(0); }
+
+      /* ── Watch Ad for XP button ── */
+      .watch-ad-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+      .watch-ad-btn {
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        color: #fff;
+        border: none;
+        box-shadow: 0 10px 28px rgba(124, 58, 237, 0.35);
+        font-size: 0.92rem;
+      }
+      .watch-ad-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(124, 58, 237, 0.5);
+      }
+      .watch-ad-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .watch-ad-count {
+        font-size: 0.82rem;
+        color: #94a3b8;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      /* ── Rewarded Ad Overlay ── */
+      .ad-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.82);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 30000;
+        backdrop-filter: blur(6px);
+      }
+      .ad-overlay.visible { display: flex; }
+
+      .ad-box {
+        position: relative;
+        width: min(60vw, 860px);
+        background: rgba(15, 23, 42, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+      }
+      @media (max-width: 700px) {
+        .ad-box { width: min(96vw, 860px); }
+      }
+
+      .ad-box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px 10px;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      .ad-box-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+      }
+
+      .ad-box-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .ad-mute-btn, .ad-skip-btn {
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 10px;
+        color: #e2e8f0;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+      }
+      .ad-mute-btn:hover { background: rgba(51, 65, 85, 0.9); }
+      .ad-skip-btn { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; }
+      .ad-skip-btn:hover:not(:disabled) { background: rgba(56, 189, 248, 0.22); }
+      .ad-skip-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: rgba(30, 41, 59, 0.7);
+        color: #64748b;
+      }
+
+      .ad-video-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+      }
+      .ad-video-wrap video {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+      }
+
+      .ad-countdown {
+        position: absolute;
+        bottom: 10px;
+        left: 12px;
+        background: rgba(0,0,0,.6);
+        color: #e2e8f0;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
+      .ad-box-footer {
+        padding: 8px 16px 10px;
+        font-size: 0.72rem;
+        color: #475569;
+        text-align: center;
+      }
     </style>
+    <script src="codes.js"></script>
   </head>
   <body>
     <div class="language-switcher">
@@ -592,6 +1319,14 @@
           <a class="button secondary" id="releasesBtn" href="https://rls.xmenu.dev" aria-label="Releases">
             Releases
           </a>
+
+          <button class="button yt-free" id="ytAdFreeBtn" type="button" aria-label="YouTube Ad Free">
+            ▶ YouTube Ad Free
+          </button>
+
+          <button class="button secondary" id="membershipBtn" type="button" aria-label="View membership">
+            🏆 Membership
+          </button>
         </div>
 
         <p id="signedInLabel" style="display: none; margin-top: 10px; color: #cbd5e1;"></p>
@@ -618,7 +1353,7 @@
         </div>
       </section>
 
-      <section class="support-panel" id="supportPanel" hidden>
+      <section class="support-panel" id="supportPanel">
         <div>
           <h2 data-i18n="support.title">Tech Support Request</h2>
           <p data-i18n="support.description">
@@ -630,11 +1365,18 @@
           <div class="support-grid">
             <label>
               <span data-i18n="support.deviceType">Device Type</span>
-              <select name="deviceType" required>
+              <select name="deviceType" id="deviceTypeSelect" required>
                 <option value="" disabled selected data-i18n="support.pleaseSelect">Please select</option>
-                <option value="Phone">Phone</option>
+                <option value="Phone">Phone / Smartphone</option>
                 <option value="Laptop">Laptop</option>
-                <option value="iPad">iPad</option>
+                <option value="iPad">iPad / Tablet</option>
+                <option value="Desktop">Desktop PC</option>
+                <option value="iMac">iMac</option>
+                <option value="MacBook">MacBook</option>
+                <option value="Smartwatch">Smartwatch</option>
+                <option value="Smart TV">Smart TV</option>
+                <option value="Gaming Console">Gaming Console</option>
+                <option value="Other">Other Device</option>
               </select>
             </label>
             <label>
@@ -660,10 +1402,28 @@
             <span data-i18n="support.issue">Describe your problem</span>
             <textarea
               name="issue"
+              id="issueTextarea"
               data-i18n-placeholder="support.issuePlaceholder"
               placeholder="Brief description of the problem…"
               required
             ></textarea>
+          </label>
+          <div id="priceEstimate" class="price-estimate"></div>
+          <label>
+            <span data-i18n="support.discountCode">Discount Code (optional)</span>
+            <div class="discount-code-row">
+              <input
+                name="discountCode"
+                id="discountCodeInput"
+                data-i18n-placeholder="support.discountCodePlaceholder"
+                placeholder="Enter code (e.g. 2026Xrepairpro)"
+                autocomplete="off"
+              />
+              <button class="apply-code-btn" type="button" id="applyCodeBtn">
+                <span data-i18n="support.applyCode">Apply</span>
+              </button>
+            </div>
+            <span class="code-feedback" id="codeFeedback"></span>
           </label>
           <div class="support-actions">
             <button class="button primary" type="submit">
@@ -676,14 +1436,120 @@
         </form>
       </section>
 
+      <!-- ── Membership Panel ── -->
+      <section class="membership-panel" id="membershipPanel" aria-label="Membership">
+        <div>
+          <h2>🏆 Your Membership</h2>
+          <p>Earn XP by entering codes to unlock membership tiers and exclusive discount codes for repairs.</p>
+        </div>
+
+        <!-- Current status card -->
+        <div class="member-status-card">
+          <div class="member-badge-row">
+            <span class="member-tier-icon" id="memberTierIcon">—</span>
+            <div>
+              <div class="member-tier-name" id="memberTierName">No Membership</div>
+              <div class="member-xp-display" id="memberXpDisplay">0 XP</div>
+            </div>
+          </div>
+
+          <!-- Progress to next tier -->
+          <div class="xp-progress-wrap" id="memberProgressWrap" style="display:none;">
+            <div class="xp-progress-labels">
+              <span id="memberProgressLabel">Progress to Bronze</span>
+              <span id="memberProgressXp">0 / 100 XP</span>
+            </div>
+            <div class="xp-bar-bg">
+              <div class="xp-bar-fill" id="memberProgressFill" style="width:0%;"></div>
+            </div>
+          </div>
+
+          <!-- Membership perk / discount code -->
+          <div class="member-perk-box" id="memberPerkBox" style="display:none;">
+            <span class="member-perk-label">Your discount code:</span>
+            <span class="member-perk-code" id="memberPerkCode">—</span>
+            <button class="copy-code-btn" id="copyMemberCodeBtn" type="button">📋 Copy</button>
+          </div>
+
+          <!-- Watch Ad for XP -->
+          <div class="watch-ad-row">
+            <button class="button watch-ad-btn" id="watchAdBtn" type="button" disabled>🎬 Watch Ad for XP (+10 XP)</button>
+            <span class="watch-ad-count" id="watchAdCount">5 / 5 left today</span>
+          </div>
+        </div>
+
+        <!-- Tier overview -->
+        <div class="tier-overview" id="tierOverview">
+          <!-- populated by JS from codes.js -->
+        </div>
+      </section>
+
+      <section class="reviews" aria-label="Kundenbewertungen">
+        <div class="review-card">
+          <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="review-text">"Der Service verlief schnell und ohne viele Komplikationen"</p>
+          <div class="review-meta">
+            <strong>Hamza</strong> &mdash; MacBook Air SSD Reparatur &mdash; 5/5
+          </div>
+        </div>
+      </section>
+
       <footer>
         <div class="footer-note">
           <span class="pill" data-i18n="footer.comingSoon">Coming Soon</span>
           <span data-i18n="footer.patch">Patch 1.2.7</span>
         </div>
         <span data-i18n="footer.contact">Contact: support@xmenu.dev</span>
+        <a class="impressum-link" href="impressum.html">Impressum</a>
+        <a class="impressum-link" href="datenschutz.html">Datenschutz</a>
+        <button class="secret-code-trigger" id="secretCodeTrigger" type="button" title="Enter a secret code">🔑</button>
       </footer>
     </main>
+
+    <div class="xp-toast" id="xpToast"></div>
+
+    <!-- ── Rewarded Ad Overlay ── -->
+    <div class="ad-overlay" id="adOverlay" role="dialog" aria-modal="true" aria-label="Ad">
+      <div class="ad-box">
+        <div class="ad-box-header">
+          <span class="ad-box-title" id="adTitle">Advertisement</span>
+          <div class="ad-box-controls">
+            <button class="ad-mute-btn" id="adMuteBtn" type="button" aria-label="Toggle mute">🔇 Unmute</button>
+            <button class="ad-skip-btn" id="adSkipBtn" type="button" disabled aria-label="Skip ad">Skip in <span id="adSkipCountdown">5</span>s</button>
+          </div>
+        </div>
+        <div class="ad-video-wrap">
+          <video id="adVideo" playsinline preload="metadata"></video>
+          <div class="ad-countdown" id="adCountdown" aria-live="polite"></div>
+        </div>
+        <div class="ad-box-footer">Watch the full ad to earn +10 XP 🎯</div>
+      </div>
+    </div>
+
+    <div class="secret-modal-overlay" id="secretCodeModal" role="dialog" aria-modal="true" aria-label="Enter secret code">
+      <div class="secret-modal-box">
+        <p class="secret-modal-title">Enter secret code</p>
+        <div class="secret-modal-row">
+          <input type="text" id="secretModalInput" class="secret-modal-input" placeholder="Secret code…" autocomplete="off" />
+          <button class="apply-code-btn" id="secretModalSubmit" type="button">Unlock</button>
+        </div>
+        <button class="secret-modal-cancel" id="secretModalClose" type="button">Cancel</button>
+      </div>
+    </div>
+
+    <div class="customize-panel" id="customizePanel" aria-label="Theme customization">
+      <h3>
+        🎨 Themes
+        <button class="close-customize" id="closeCustomize" type="button" aria-label="Close customization panel">✕</button>
+      </h3>
+      <div class="theme-grid">
+        <button class="theme-btn active" data-theme="default">Default</button>
+        <button class="theme-btn" data-theme="ocean">Ocean</button>
+        <button class="theme-btn" data-theme="forest">Forest</button>
+        <button class="theme-btn" data-theme="sunset">Sunset</button>
+        <button class="theme-btn" data-theme="minimal">Minimal</button>
+      </div>
+    </div>
 
     <script>
       // Translation data
@@ -736,7 +1602,16 @@
             issue: "Describe your problem",
             issuePlaceholder: "Brief description of the problem…",
             submit: "Request Support",
-            helper: "Your email program will open with the pre-filled message."
+            helper: "Your email client will open to send the request.",
+            discountCode: "Discount Code (optional)",
+            discountCodePlaceholder: "Enter code (e.g. 2026Xrepairpro)",
+            applyCode: "Apply",
+            codeApplied: "✓ Code applied: {discount}% Discount",
+            codeInvalid: "✗ Invalid code",
+            codeUnlocked: "✓ Customization panel unlocked!",
+            pricePhone: "📞 Estimated cost: from 2.50 € (phone support)",
+            priceStorage: "💾 Estimated cost: from 40 € (storage repair)",
+            priceOther: "🔧 Estimated cost: 2 € – 100 € (general repair)"
           },
           footer: {
             comingSoon: "Coming Soon",
@@ -803,7 +1678,16 @@
             issuePlaceholder: "Kurze Beschreibung des Problems…",
             submit: "Support anfragen",
             helper:
-              "Es öffnet sich dein E-Mail-Programm mit der vorausgefüllten Nachricht."
+              "Dein E-Mail-Programm öffnet sich zum Senden der Anfrage.",
+            discountCode: "Rabattcode (optional)",
+            discountCodePlaceholder: "Code eingeben (z. B. 2026Xrepairpro)",
+            applyCode: "Anwenden",
+            codeApplied: "✓ Code angewendet: {discount}% Rabatt",
+            codeInvalid: "✗ Ungültiger Code",
+            codeUnlocked: "✓ Anpassungsbereich freigeschaltet!",
+            pricePhone: "📞 Geschätzte Kosten: ab 2,50 € (Telefon-Support)",
+            priceStorage: "💾 Geschätzte Kosten: ab 40 € (Speicher-Reparatur)",
+            priceOther: "🔧 Geschätzte Kosten: 2 € – 100 € (allgemeine Reparatur)"
           },
           footer: {
             comingSoon: "Demnächst verfügbar",
@@ -874,6 +1758,9 @@
       const downloadBtn = document.getElementById("downloadBtn");
       const supportPanel = document.getElementById("supportPanel");
       const supportForm = document.getElementById("supportForm");
+      const deviceTypeSelect = document.getElementById("deviceTypeSelect");
+      const issueTextarea = document.getElementById("issueTextarea");
+      const priceEstimate = document.getElementById("priceEstimate");
 
       const loginRedirectUrl =
         "https://accounts.xmenu.dev/?returnTo=" + encodeURIComponent(window.location.href);
@@ -939,20 +1826,443 @@
       });
 
       const toggleSupportPanel = () => {
-        const isHidden = supportPanel.hasAttribute("hidden");
+        const isOpen = supportPanel.classList.contains("support-panel--open");
         const t = translations[currentLang];
 
-        if (isHidden) {
-          supportPanel.removeAttribute("hidden");
+        if (!isOpen) {
+          supportPanel.classList.add("support-panel--open");
           supportToggle.querySelector("[data-i18n]").textContent = t.header.supportClose;
           setTimeout(() => {
             supportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 10);
         } else {
-          supportPanel.setAttribute("hidden", "");
+          supportPanel.classList.remove("support-panel--open");
           supportToggle.querySelector("[data-i18n]").textContent = t.header.support;
         }
       };
+
+      // ── Price Estimate ────────────────────────────────────────────────────
+      const STORAGE_KEYWORDS = ["storage", "disk", "ssd", "hdd", "speicher", "festplatte", "laufwerk", "flash", "memory"];
+      const PHONE_KEYWORDS   = ["phone", "handy", "smartphone", "mobil"];
+
+      function updatePriceEstimate() {
+        const issue      = (issueTextarea.value || "").toLowerCase();
+        const deviceType = (deviceTypeSelect.value || "").toLowerCase();
+        const t          = translations[currentLang];
+
+        const hasPhone   = PHONE_KEYWORDS.some(k => issue.includes(k)) || deviceType === "phone";
+        const hasStorage = STORAGE_KEYWORDS.some(k => issue.includes(k));
+
+        let label = "";
+        if (hasPhone) {
+          label = t.support.pricePhone;
+        } else if (hasStorage) {
+          label = t.support.priceStorage;
+        } else if (issue.trim().length > 10) {
+          label = t.support.priceOther;
+        }
+
+        if (label) {
+          priceEstimate.textContent = label;
+          priceEstimate.style.display = "block";
+          // Restart the CSS animation: first reset it, then force a synchronous
+          // reflow (reading offsetHeight flushes the style change), then re-enable.
+          priceEstimate.style.animation = "none";
+          void priceEstimate.offsetHeight; // forces browser reflow to restart animation
+          priceEstimate.style.animation = "";
+        } else {
+          priceEstimate.style.display = "none";
+        }
+      }
+
+      issueTextarea.addEventListener("input", updatePriceEstimate);
+      deviceTypeSelect.addEventListener("change", updatePriceEstimate);
+
+      // ── Discount & Secret Codes ───────────────────────────────────────────
+      const _cfg               = (window.XMENU_CODE_CONFIG || {});
+      const DISCOUNT_CODES     = Object.assign({}, _cfg.DISCOUNT_CODES || { "2026xrepairpro": { discount: 10, xpReward: 50, maxUses: null } });
+      const MEMBER_CODES       = _cfg.MEMBERSHIP_DISCOUNT_CODES || {};
+      const ADMIN_CODE_KEY     = (_cfg.ADMIN_CODE || "admin123").toLowerCase();
+      const ADMIN_XP_REWARD    = _cfg.ADMIN_XP_REWARD || 100;
+      const MEMBERSHIP_TIERS   = _cfg.MEMBERSHIP_TIERS || [];
+
+      // Merge custom codes stored by admin panel into DISCOUNT_CODES at runtime
+      (function mergeAdminCustomCodes() {
+        try {
+          const custom = JSON.parse(localStorage.getItem("xmenu_admin_custom_codes") || "{}");
+          for (const [k, v] of Object.entries(custom)) {
+            // Validate structure before merging to prevent arbitrary injection
+            if (
+              typeof k === "string" && k.length > 0 && k.length <= 64 &&
+              typeof v === "object" && v !== null &&
+              typeof v.discount === "number" && v.discount >= 0 && v.discount <= 100 &&
+              !DISCOUNT_CODES[k]
+            ) {
+              DISCOUNT_CODES[k] = { discount: v.discount, xpReward: Number(v.xpReward) || 0, maxUses: v.maxUses || null };
+            }
+          }
+        } catch (e) { /* ignore */ }
+      })();
+
+      // ── XP / Membership system ────────────────────────────────────────────
+      // XP is stored per-user in localStorage.  The key switches from "guest"
+      // to the Supabase user-id once auth is resolved (see module script below).
+      let xpStorageKey = "xmenu_xp_guest";
+
+      function getXP() {
+        try { return parseInt(localStorage.getItem(xpStorageKey) || "0", 10) || 0; } catch { return 0; }
+      }
+      function setXP(val) {
+        try { localStorage.setItem(xpStorageKey, String(Math.max(0, val))); } catch {}
+      }
+      function addXP(amount) {
+        const newXP = getXP() + amount;
+        setXP(newXP);
+        return newXP;
+      }
+
+      // Track per-code usage (for maxUses enforcement)
+      function getCodeUsage(code) {
+        try { return JSON.parse(localStorage.getItem("xmenu_code_usage") || "{}"); } catch { return {}; }
+      }
+      function incrementCodeUsage(code) {
+        try {
+          const usage = getCodeUsage();
+          usage[code] = (usage[code] || 0) + 1;
+          localStorage.setItem("xmenu_code_usage", JSON.stringify(usage));
+        } catch {}
+      }
+
+      function getTierForXP(xp) {
+        let current = MEMBERSHIP_TIERS[0] || { id: "none", label: "No Membership", xpRequired: 0, color: "#64748b", icon: "—", discountCode: null, discountPct: 0 };
+        for (const tier of MEMBERSHIP_TIERS) {
+          if (xp >= tier.xpRequired) current = tier;
+        }
+        return current;
+      }
+
+      function getNextTier(currentTierId) {
+        const idx = MEMBERSHIP_TIERS.findIndex(t => t.id === currentTierId);
+        if (idx === -1 || idx === MEMBERSHIP_TIERS.length - 1) return null;
+        return MEMBERSHIP_TIERS[idx + 1];
+      }
+
+      // ── XP toast notification ─────────────────────────────────────────────
+      let xpToastTimer = null;
+      function showXpToast(msg) {
+        const toast = document.getElementById("xpToast");
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("visible");
+        if (xpToastTimer) clearTimeout(xpToastTimer);
+        xpToastTimer = setTimeout(() => toast.classList.remove("visible"), 3000);
+      }
+
+      // ── Membership panel render ───────────────────────────────────────────
+      function renderMembership() {
+        const xp          = getXP();
+        const tier        = getTierForXP(xp);
+        const nextTier    = getNextTier(tier.id);
+
+        // Badge row
+        const iconEl = document.getElementById("memberTierIcon");
+        const nameEl = document.getElementById("memberTierName");
+        const xpEl   = document.getElementById("memberXpDisplay");
+        if (iconEl) iconEl.textContent = tier.icon || "—";
+        if (nameEl) { nameEl.textContent = tier.label; nameEl.style.color = tier.color || "#f8fafc"; }
+        if (xpEl)   xpEl.textContent = xp.toLocaleString() + " XP";
+
+        // Progress to next tier
+        const progressWrap = document.getElementById("memberProgressWrap");
+        if (progressWrap) {
+          if (nextTier) {
+            progressWrap.style.display = "";
+            const prevXp  = tier.xpRequired;
+            const needed  = nextTier.xpRequired - prevXp;
+            const earned  = Math.min(xp - prevXp, needed);
+            const pct     = needed > 0 ? Math.round((earned / needed) * 100) : 100;
+            document.getElementById("memberProgressLabel").textContent = "Progress to " + nextTier.label;
+            document.getElementById("memberProgressXp").textContent    = xp.toLocaleString() + " / " + nextTier.xpRequired.toLocaleString() + " XP";
+            document.getElementById("memberProgressFill").style.width  = pct + "%";
+          } else {
+            progressWrap.style.display = "none";
+          }
+        }
+
+        // Perk / discount code
+        const perkBox  = document.getElementById("memberPerkBox");
+        const perkCode = document.getElementById("memberPerkCode");
+        if (perkBox) {
+          if (tier.discountCode) {
+            perkBox.style.display = "";
+            if (perkCode) perkCode.textContent = tier.discountCode;
+          } else {
+            perkBox.style.display = "none";
+          }
+        }
+
+        // Tier overview cards
+        const overview = document.getElementById("tierOverview");
+        if (overview && MEMBERSHIP_TIERS.length) {
+          overview.innerHTML = "";
+          MEMBERSHIP_TIERS.forEach(function(t) {
+            const card = document.createElement("div");
+            card.className = "tier-card" + (t.id === tier.id ? " tier-active" : "");
+
+            const iconEl2 = document.createElement("span");
+            iconEl2.className = "tier-card-icon";
+            iconEl2.textContent = t.icon || "—";
+
+            const nameEl2 = document.createElement("div");
+            nameEl2.className = "tier-card-name";
+            nameEl2.style.color = t.color || "#f8fafc";
+            nameEl2.textContent = t.label;
+
+            const xpEl2 = document.createElement("div");
+            xpEl2.className = "tier-card-xp";
+            xpEl2.textContent = t.xpRequired === 0 ? "Starting tier" : t.xpRequired.toLocaleString() + " XP";
+
+            const perkEl = document.createElement("div");
+            perkEl.className = "tier-card-perk";
+            perkEl.textContent = t.discountCode ? t.discountPct + "% discount code" : "No perk";
+
+            card.appendChild(iconEl2);
+            card.appendChild(nameEl2);
+            card.appendChild(xpEl2);
+            card.appendChild(perkEl);
+            overview.appendChild(card);
+          });
+        }
+      }
+
+      // Expose so the Supabase module can switch the storage key once user is known
+      window.xmenuMembership = {
+        setUserId(uid) {
+          if (uid) xpStorageKey = "xmenu_xp_" + uid;
+          renderMembership();
+        },
+        renderMembership
+      };
+
+      const SECRET_UI_CODES = {
+        "customization": { action: "theme_panel" },
+        "nightpro":      { action: "theme_panel" }
+      };
+
+      let appliedCode     = null;
+      let appliedDiscount = 0;
+
+      const discountCodeInput = document.getElementById("discountCodeInput");
+      const applyCodeBtn      = document.getElementById("applyCodeBtn");
+      const codeFeedback      = document.getElementById("codeFeedback");
+
+      // Award XP and notify user; check for tier upgrades
+      function awardXP(amount, label) {
+        const prevTier = getTierForXP(getXP());
+        const newXP    = addXP(amount);
+        const newTier  = getTierForXP(newXP);
+        renderMembership();
+        showXpToast("+" + amount + " XP! (" + label + ") — " + newXP.toLocaleString() + " XP total");
+        // Announce tier upgrade
+        if (newTier.id !== prevTier.id && newTier.id !== "none") {
+          setTimeout(() => showXpToast("🎉 " + newTier.icon + " " + newTier.label + " tier unlocked!"), 3200);
+        }
+        incrementCodeUsage(label.toLowerCase());
+      }
+
+      function applyDiscountCode() {
+        const raw        = (discountCodeInput.value || "").trim();
+        const normalized = raw.toLowerCase();
+        const t          = translations[currentLang];
+
+        if (!raw) {
+          appliedCode     = null;
+          appliedDiscount = 0;
+          codeFeedback.textContent = "";
+          codeFeedback.className   = "code-feedback";
+          return;
+        }
+
+        // 1. Secret UI codes (theme unlock, etc.)
+        if (SECRET_UI_CODES[normalized]) {
+          const action = SECRET_UI_CODES[normalized].action;
+          if (action === "theme_panel") {
+            document.getElementById("customizePanel").classList.add("visible");
+            codeFeedback.textContent = t.support.codeUnlocked;
+            codeFeedback.className   = "code-feedback success";
+            discountCodeInput.value  = "";
+          }
+          return;
+        }
+
+        // 2. Admin code – awards XP, does not apply discount
+        if (normalized === ADMIN_CODE_KEY) {
+          awardXP(ADMIN_XP_REWARD, raw);
+          codeFeedback.textContent = "✓ Admin code accepted! +" + ADMIN_XP_REWARD + " XP";
+          codeFeedback.className   = "code-feedback success";
+          discountCodeInput.value  = "";
+          appliedCode     = null;
+          appliedDiscount = 0;
+          return;
+        }
+
+        // 3. Regular discount codes
+        if (DISCOUNT_CODES[normalized]) {
+          const info = DISCOUNT_CODES[normalized];
+          // Check usage limit
+          const usage = getCodeUsage();
+          if (info.maxUses != null && (usage[normalized] || 0) >= info.maxUses) {
+            codeFeedback.textContent = "✗ This code has reached its usage limit.";
+            codeFeedback.className   = "code-feedback error";
+            return;
+          }
+          appliedCode     = raw;
+          appliedDiscount = info.discount;
+          codeFeedback.textContent = t.support.codeApplied.replace("{discount}", appliedDiscount);
+          codeFeedback.className   = "code-feedback success";
+          // Award XP once per code (first use by this user)
+          const xpUsageKey = "xmenu_code_xp_used_" + normalized;
+          const alreadyAwarded = (() => { try { return localStorage.getItem(xpUsageKey) === "1"; } catch { return false; } })();
+          if (!alreadyAwarded && info.xpReward) {
+            awardXP(info.xpReward, raw);
+            try { localStorage.setItem(xpUsageKey, "1"); } catch {}
+          }
+          return;
+        }
+
+        // 4. Membership discount codes (valid for any user who has that tier or higher)
+        const memberCodeKey = raw.toUpperCase();
+        if (MEMBER_CODES[memberCodeKey]) {
+          const info      = MEMBER_CODES[memberCodeKey];
+          const userTier  = getTierForXP(getXP());
+          const tiers     = MEMBERSHIP_TIERS;
+          const userIdx   = tiers.findIndex(tt => tt.id === userTier.id);
+          const reqIdx    = tiers.findIndex(tt => tt.id === info.tier);
+          if (userIdx !== -1 && reqIdx !== -1 && userIdx >= reqIdx) {
+            appliedCode     = raw;
+            appliedDiscount = info.discount;
+            codeFeedback.textContent = t.support.codeApplied.replace("{discount}", appliedDiscount);
+            codeFeedback.className   = "code-feedback success";
+            incrementCodeUsage(memberCodeKey.toLowerCase());
+          } else {
+            const needed = MEMBERSHIP_TIERS[reqIdx] ? MEMBERSHIP_TIERS[reqIdx].label : info.tier;
+            codeFeedback.textContent = "✗ Requires " + needed + " membership.";
+            codeFeedback.className   = "code-feedback error";
+          }
+          return;
+        }
+
+        // 5. Invalid
+        appliedCode     = null;
+        appliedDiscount = 0;
+        codeFeedback.textContent = t.support.codeInvalid;
+        codeFeedback.className   = "code-feedback error";
+      }
+
+      applyCodeBtn.addEventListener("click", applyDiscountCode);
+      discountCodeInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); applyDiscountCode(); }
+      });
+
+      // Secret code trigger (🔑 button in footer) – opens inline modal
+      const secretCodeTrigger = document.getElementById("secretCodeTrigger");
+      const secretModal        = document.getElementById("secretCodeModal");
+      const secretModalInput   = document.getElementById("secretModalInput");
+      const secretModalSubmit  = document.getElementById("secretModalSubmit");
+      const secretModalClose   = document.getElementById("secretModalClose");
+
+      function submitSecretModal() {
+        const raw        = (secretModalInput.value || "").trim();
+        const normalized = raw.toLowerCase();
+        secretModal.classList.remove("visible");
+        secretModalInput.value = "";
+
+        // Admin code
+        if (normalized === ADMIN_CODE_KEY) {
+          awardXP(ADMIN_XP_REWARD, raw);
+          return;
+        }
+
+        if (SECRET_UI_CODES[normalized]) {
+          const action = SECRET_UI_CODES[normalized].action;
+          if (action === "theme_panel") {
+            document.getElementById("customizePanel").classList.add("visible");
+          }
+        }
+      }
+
+      secretCodeTrigger.addEventListener("click", () => {
+        secretModal.classList.add("visible");
+        secretModalInput.focus();
+      });
+      secretModalSubmit.addEventListener("click", submitSecretModal);
+      secretModalClose.addEventListener("click", () => {
+        secretModal.classList.remove("visible");
+        secretModalInput.value = "";
+      });
+      secretModalInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submitSecretModal();
+        if (e.key === "Escape") { secretModal.classList.remove("visible"); secretModalInput.value = ""; }
+      });
+
+      // ── Membership panel toggle ───────────────────────────────────────────
+      const membershipBtn   = document.getElementById("membershipBtn");
+      const membershipPanel = document.getElementById("membershipPanel");
+
+      membershipBtn.addEventListener("click", () => {
+        const isOpen = membershipPanel.classList.contains("membership-panel--open");
+        if (!isOpen) {
+          // Close support panel if open
+          supportPanel.classList.remove("support-panel--open");
+          supportToggle.querySelector("[data-i18n]").textContent = translations[currentLang].header.support;
+
+          membershipPanel.classList.add("membership-panel--open");
+          renderMembership();
+          setTimeout(() => {
+            membershipPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 10);
+        } else {
+          membershipPanel.classList.remove("membership-panel--open");
+        }
+      });
+
+      // Copy membership discount code to clipboard
+      document.getElementById("copyMemberCodeBtn").addEventListener("click", () => {
+        const code = document.getElementById("memberPerkCode").textContent;
+        if (!code || code === "—") return;
+        navigator.clipboard.writeText(code).then(() => {
+          showXpToast("📋 Code copied: " + code);
+        }).catch(() => {
+          showXpToast("Copy failed – code: " + code);
+        });
+      });
+
+      // Customization panel
+      const customizePanel = document.getElementById("customizePanel");
+      document.getElementById("closeCustomize").addEventListener("click", () => {
+        customizePanel.classList.remove("visible");
+      });
+
+      const ALL_THEMES = ["ocean", "forest", "sunset", "minimal"];
+
+      function applyTheme(theme) {
+        ALL_THEMES.forEach(t => document.body.classList.remove("theme-" + t));
+        if (theme !== "default") {
+          document.body.classList.add("theme-" + theme);
+        }
+        document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+        const activeBtn = document.querySelector('.theme-btn[data-theme="' + theme + '"]');
+        if (activeBtn) activeBtn.classList.add("active");
+        localStorage.setItem("xmenu-theme", theme);
+      }
+
+      document.querySelectorAll(".theme-btn").forEach(btn => {
+        btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+      });
+
+      // Restore saved theme on load
+      const savedTheme = localStorage.getItem("xmenu-theme");
+      if (savedTheme) applyTheme(savedTheme);
 
       supportToggle.addEventListener("click", async () => {
         const canAccess = await window.xmenuRequireAuth();
@@ -970,31 +2280,392 @@
       supportForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        const t = translations[currentLang];
         const formData = new FormData(supportForm);
 
         const deviceType = String(formData.get("deviceType") || "");
-        const brand = String(formData.get("brand") || "");
-        const model = String(formData.get("model") || "");
-        const issue = String(formData.get("issue") || "");
+        const brand      = String(formData.get("brand")      || "");
+        const model      = String(formData.get("model")      || "");
+        const issue      = String(formData.get("issue")      || "");
 
+        const tData = translations[currentLang];
         const subject = encodeURIComponent(`Tech Support: ${deviceType} - ${brand} ${model}`.trim());
-
         const bodyLines = [
-          `${t.support.deviceType}: ${deviceType}`,
-          `${t.support.brand}: ${brand}`,
-          `${t.support.model}: ${model}`,
+          `${tData.support.deviceType}: ${deviceType}`,
+          `${tData.support.brand}: ${brand}`,
+          `${tData.support.model}: ${model}`,
           "",
           issue
         ];
+        if (appliedCode) {
+          bodyLines.push("");
+          bodyLines.push(`Used code: ${appliedCode} | Discount: ${appliedDiscount}%`);
+        }
         const body = encodeURIComponent(bodyLines.join("\n"));
-
         window.location.href = `mailto:support@xmenu.dev?subject=${subject}&body=${body}`;
       });
 
-      const savedLang = localStorage.getItem("xmenu-lang") || "en";
-      setLanguage(savedLang);
       start();
+      renderMembership();
+    </script>
+
+    <div class="yt-modal-overlay" id="ytModal" role="dialog" aria-modal="true" aria-label="YouTube Ad Free">
+      <div class="yt-modal-box">
+        <div class="yt-modal-header">
+          <span class="yt-modal-title">▶ YouTube Ad Free &mdash; powered by skipcut.com</span>
+          <button class="yt-ctrl-btn danger" id="ytModalClose" type="button" aria-label="Close">✕ Close</button>
+        </div>
+        <div class="yt-iframe-wrap" id="ytIframeWrap">
+          <iframe
+            id="ytIframe"
+            class="yt-iframe"
+            src="https://skipcut.com"
+            title="YouTube Ad Free – skipcut.com"
+            allowfullscreen
+            allow="autoplay; fullscreen; picture-in-picture"
+            sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+          ></iframe>
+        </div>
+        <div class="yt-controls">
+          <!-- Volume -->
+          <div class="yt-volume-row">
+            <span class="yt-volume-label">🔊</span>
+            <input type="range" class="yt-volume-slider" id="ytVolume" min="0" max="100" value="100" aria-label="Volume" />
+            <span class="yt-volume-label" id="ytVolumeVal">100%</span>
+          </div>
+
+          <!-- Size toggle -->
+          <button class="yt-ctrl-btn" id="ytSizeBtn" type="button" aria-label="Toggle size">⤢ Expand</button>
+
+          <!-- Go back -->
+          <button class="yt-ctrl-btn" id="ytBackBtn" type="button" aria-label="Go back">← Back</button>
+
+          <!-- Refresh -->
+          <button class="yt-ctrl-btn" id="ytRefreshBtn" type="button" aria-label="Refresh">↺ Refresh</button>
+
+          <!-- Open another URL -->
+          <div class="yt-spacer"></div>
+          <input type="url" class="yt-url-input" id="ytUrlInput" placeholder="Open another URL… (e.g. https://skipcut.com/…)" aria-label="Open URL in player" />
+          <button class="yt-ctrl-btn" id="ytGoBtn" type="button" aria-label="Go to URL">Go →</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ── YouTube Ad Free modal ───────────────────────────────────────────────
+      (function () {
+        const overlay    = document.getElementById("ytModal");
+        const openBtn    = document.getElementById("ytAdFreeBtn");
+        const closeBtn   = document.getElementById("ytModalClose");
+        const iframe     = document.getElementById("ytIframe");
+        const wrap       = document.getElementById("ytIframeWrap");
+        const sizeBtn    = document.getElementById("ytSizeBtn");
+        const backBtn    = document.getElementById("ytBackBtn");
+        const refreshBtn = document.getElementById("ytRefreshBtn");
+        const urlInput   = document.getElementById("ytUrlInput");
+        const goBtn      = document.getElementById("ytGoBtn");
+        const volSlider  = document.getElementById("ytVolume");
+        const volLabel   = document.getElementById("ytVolumeVal");
+
+        let expanded = false;
+
+        function openModal() {
+          overlay.classList.add("visible");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          overlay.classList.remove("visible");
+          document.body.style.overflow = "";
+        }
+
+        openBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closeModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("visible")) closeModal();
+        });
+
+        // Size toggle
+        sizeBtn.addEventListener("click", () => {
+          expanded = !expanded;
+          wrap.classList.toggle("fullscreen-mode", expanded);
+          sizeBtn.textContent = expanded ? "⤡ Shrink" : "⤢ Expand";
+        });
+
+        // Track the current iframe origin for targeted postMessage
+        let currentIframeOrigin = "https://skipcut.com";
+
+        // Go back – reload to initial URL (iframes from cross-origins block history navigation)
+        backBtn.addEventListener("click", () => {
+          iframe.src = "https://skipcut.com";
+          currentIframeOrigin = "https://skipcut.com";
+          urlInput.value = "";
+        });
+
+        // Refresh
+        refreshBtn.addEventListener("click", () => {
+          iframe.src = iframe.src.split("?")[0] + "?refresh=" + Date.now();
+        });
+
+        // Open another URL – only http/https allowed to prevent javascript: or data: URIs
+        function navigateTo(url) {
+          const trimmed = url.trim();
+          if (!trimmed) return;
+          const full = /^https?:\/\//i.test(trimmed) ? trimmed : "https://" + trimmed;
+          if (!/^https?:\/\//i.test(full)) return;
+          try { currentIframeOrigin = new URL(full).origin; } catch (_) {}
+          iframe.src = full;
+        }
+
+        goBtn.addEventListener("click", () => navigateTo(urlInput.value));
+        urlInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") navigateTo(urlInput.value);
+        });
+
+        // Volume – attempts to send volume to any playing video inside the iframe via postMessage.
+        // Cross-origin restrictions mean this only works if the loaded page listens for the message.
+        volSlider.addEventListener("input", () => {
+          const val = parseInt(volSlider.value, 10);
+          volLabel.textContent = val + "%";
+          try {
+            iframe.contentWindow.postMessage({ type: "setVolume", volume: val / 100 }, currentIframeOrigin);
+          } catch (err) {
+            console.debug("Volume postMessage failed (cross-origin restriction):", err);
+          }
+        });
+      })();
+    </script>
+
+    <script>
+      // ── Rewarded Ad Overlay ─────────────────────────────────────────────────
+      (function () {
+        // How often to show the ad (ms). Change this constant to adjust the interval.
+        var AD_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+        // Seconds the user must watch before skip becomes available.
+        var AD_SKIP_GATE_S = 5;
+        // XP rewarded for watching the full ad.
+        var AD_REWARD_XP = 10;
+        // localStorage key for mute preference.
+        var AD_MUTE_KEY = "xmenu_ad_muted";
+        // Max user-triggered ad watches per day.
+        var AD_DAILY_MAX        = 5;
+        var AD_DAILY_COUNT_KEY  = "xmenu_ad_daily_count";
+        var AD_DAILY_DATE_KEY   = "xmenu_ad_daily_date";
+
+        var adManifest   = [];
+        var lastPlayedId = null;
+        var adIsShowing  = false; // prevent double-trigger
+
+        // ── Daily watch counter helpers ──────────────────────────────────────
+        function getTodayStr() {
+          return new Date().toISOString().slice(0, 10);
+        }
+        function getDailyWatchCount() {
+          try {
+            if (localStorage.getItem(AD_DAILY_DATE_KEY) !== getTodayStr()) return 0;
+            return parseInt(localStorage.getItem(AD_DAILY_COUNT_KEY) || "0", 10) || 0;
+          } catch (_) { return 0; }
+        }
+        function incrementDailyCount() {
+          try {
+            localStorage.setItem(AD_DAILY_DATE_KEY, getTodayStr());
+            localStorage.setItem(AD_DAILY_COUNT_KEY, String(getDailyWatchCount() + 1));
+          } catch (_) {}
+        }
+        function updateWatchAdButton() {
+          var btn     = document.getElementById("watchAdBtn");
+          var countEl = document.getElementById("watchAdCount");
+          if (!btn) return;
+          var remaining = Math.max(0, AD_DAILY_MAX - getDailyWatchCount());
+          var ok        = canWatchAd(remaining);
+          btn.disabled  = !ok;
+          btn.title     = remaining <= 0 ? "Daily limit reached. Come back tomorrow!" : "";
+          if (countEl) countEl.textContent = remaining + " / " + AD_DAILY_MAX + " left today";
+        }
+        function canWatchAd(remaining) {
+          var rem = (remaining !== undefined) ? remaining : Math.max(0, AD_DAILY_MAX - getDailyWatchCount());
+          return adManifest.length > 0 && rem > 0 && !adIsShowing;
+        }
+
+        // Fetch the ad manifest once.
+        fetch("ads/manifest.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (data) {
+            if (Array.isArray(data) && data.length > 0) {
+              adManifest = data;
+              // Schedule first auto-ad after the full interval.
+              setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            }
+            // Update button now that we know if ads are available.
+            updateWatchAdButton();
+          })
+          .catch(function () { /* manifest unavailable – silently skip */ });
+
+        function pickAd() {
+          if (adManifest.length === 0) return null;
+          if (adManifest.length === 1) return adManifest[0];
+          // Avoid immediate repeat when possible.
+          var pool = adManifest.filter(function (a) { return a.id !== lastPlayedId; });
+          if (pool.length === 0) pool = adManifest;
+          return pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        // isUserTriggered = true when the user explicitly clicked "Watch Ad for XP".
+        function showAdOverlay(isUserTriggered) {
+          var ad = pickAd();
+          if (!ad) {
+            if (!isUserTriggered) setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            return;
+          }
+          lastPlayedId = ad.id;
+          adIsShowing  = true;
+
+          var overlay     = document.getElementById("adOverlay");
+          var video       = document.getElementById("adVideo");
+          var titleEl     = document.getElementById("adTitle");
+          var skipBtn     = document.getElementById("adSkipBtn");
+          var skipCd      = document.getElementById("adSkipCountdown");
+          var muteBtn     = document.getElementById("adMuteBtn");
+          var countdown   = document.getElementById("adCountdown");
+
+          if (!overlay || !video) { adIsShowing = false; return; }
+
+          // Per-playback state.
+          var rewardGranted = false;
+          var gateTimer     = null;
+          var gateSeconds   = AD_SKIP_GATE_S;
+
+          // Restore mute preference (start muted by default).
+          var isMuted = localStorage.getItem(AD_MUTE_KEY) !== "false";
+          video.muted = isMuted;
+          muteBtn.textContent = isMuted ? "🔇 Unmute" : "🔊 Mute";
+
+          // Set up video.
+          video.src    = ad.src;
+          if (ad.poster) video.poster = ad.poster;
+          titleEl.textContent = ad.title || "Advertisement";
+
+          // Reset skip gate.
+          skipBtn.disabled     = true;
+          skipCd.textContent   = String(AD_SKIP_GATE_S);
+          var skipLabel        = document.createTextNode("Skip in ");
+          skipBtn.textContent  = "";
+          skipBtn.appendChild(skipLabel);
+          skipBtn.appendChild(skipCd);
+          var sAfter = document.createTextNode("s");
+          skipBtn.appendChild(sAfter);
+          countdown.textContent = "";
+
+          overlay.classList.add("visible");
+          document.body.style.overflow = "hidden";
+          if (isUserTriggered) updateWatchAdButton();
+
+          video.play().catch(function () {
+            // Autoplay blocked even when muted – force muted and retry.
+            video.muted = true;
+            isMuted = true;
+            muteBtn.textContent = "🔇 Unmute";
+            try { localStorage.setItem(AD_MUTE_KEY, "true"); } catch (_) {}
+            video.play().catch(function () {});
+          });
+
+          // Countdown gate: tick every second for AD_SKIP_GATE_S seconds.
+          gateTimer = setInterval(function () {
+            gateSeconds -= 1;
+            if (gateSeconds <= 0) {
+              clearInterval(gateTimer);
+              skipBtn.disabled    = false;
+              skipBtn.textContent = "✕ Skip";
+              countdown.textContent = "";
+            } else {
+              skipCd.textContent = String(gateSeconds);
+            }
+          }, 1000);
+
+          // Show remaining duration while video plays.
+          function updateCountdown() {
+            if (!isFinite(video.duration) || video.duration <= 0) return;
+            var remaining = Math.max(0, Math.ceil(video.duration - video.currentTime));
+            if (remaining > 0) {
+              countdown.textContent = remaining + "s";
+            } else {
+              countdown.textContent = "";
+            }
+          }
+          video.addEventListener("timeupdate", updateCountdown);
+
+          // Reward granted when video ends naturally.
+          function onVideoEnded() {
+            if (!rewardGranted) {
+              rewardGranted = true;
+              var newXP = addXP(AD_REWARD_XP);
+              renderMembership();
+              showXpToast("🎬 +" + AD_REWARD_XP + " XP! (Watched ad) — " + newXP.toLocaleString() + " XP total");
+            }
+            closeAd();
+          }
+          video.addEventListener("ended", onVideoEnded);
+
+          // Mute toggle.
+          function onMuteClick() {
+            isMuted = !isMuted;
+            video.muted = isMuted;
+            muteBtn.textContent = isMuted ? "🔇 Unmute" : "🔊 Mute";
+            try { localStorage.setItem(AD_MUTE_KEY, isMuted ? "true" : "false"); } catch (_) {}
+          }
+          muteBtn.addEventListener("click", onMuteClick);
+
+          // Skip / close button.
+          function onSkipClick() {
+            if (skipBtn.disabled) return;
+            closeAd();
+          }
+          skipBtn.addEventListener("click", onSkipClick);
+
+          function closeAd() {
+            if (gateTimer) clearInterval(gateTimer);
+            video.pause();
+            video.removeEventListener("timeupdate", updateCountdown);
+            video.removeEventListener("ended", onVideoEnded);
+            muteBtn.removeEventListener("click", onMuteClick);
+            skipBtn.removeEventListener("click", onSkipClick);
+            overlay.classList.remove("visible");
+            document.body.style.overflow = "";
+            video.src = "";
+            countdown.textContent = "";
+            adIsShowing = false;
+            if (isUserTriggered) {
+              // Re-enable the button (or keep disabled if limit reached).
+              updateWatchAdButton();
+            } else {
+              // Schedule next auto-ad.
+              setTimeout(showAdOverlay, AD_INTERVAL_MS);
+            }
+          }
+        }
+
+        // ── Expose for the "Watch Ad for XP" button ─────────────────────────
+        window.xMenuAds = {
+          trigger: function () {
+            if (!canWatchAd()) return;
+            incrementDailyCount();
+            updateWatchAdButton();
+            showAdOverlay(true);
+          },
+          updateButton: updateWatchAdButton
+        };
+
+        // Wire the button click handler and set initial state once DOM is ready.
+        document.addEventListener("DOMContentLoaded", function () {
+          var btn = document.getElementById("watchAdBtn");
+          if (btn) btn.addEventListener("click", function () { window.xMenuAds.trigger(); });
+          updateWatchAdButton();
+        });
+      })();
     </script>
 
     <script type="module">
@@ -1039,10 +2710,15 @@
           accountBtn.href =
             "https://accounts.xmenu.dev/?returnTo=" +
             encodeURIComponent("https://xmenu.dev/");
+          // Guest mode – refresh membership with guest key
+          if (window.xmenuMembership) window.xmenuMembership.setUserId(null);
           return;
         }
 
         await ensureProfileRow(user.id);
+
+        // Switch XP storage to this user's key and refresh membership display
+        if (window.xmenuMembership) window.xmenuMembership.setUserId(user.id);
 
         const { data: profile } = await supabase
           .from("profiles")
@@ -1067,5 +2743,6 @@
 
       renderAccount();
     </script>
+
   </body>
 </html>
